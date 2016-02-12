@@ -1,0 +1,4 @@
+Piper
+=====
+
+GTK application to configure gaming mice. Piper uses libratbag via ratbagd.
