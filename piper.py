@@ -8,12 +8,28 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 class Piper(Gtk.Window):
+
+    def _init_error(self):
+        box = self._builder.get_object("piper-error-box")
+
+        btn = self._builder.get_object("piper-error-button")
+        btn.connect("clicked", Gtk.main_quit)
+
+        error = self._builder.get_object("piper-error-body-label")
+        error.set_text("Could not find any devices. Do you have anything vaguely mouse-looking plugged in?")
+
+        self.add(box)
+
     def __init__(self):
         Gtk.Window.__init__(self, title="Piper")
+        main_window = Gtk.Builder()
+        main_window.add_from_file("piper.ui")
+        self._builder = main_window;
 
         self._ratbag = self._init_ratbag()
         if len(self._ratbag.devices) == 0:
-            return
+            self._init_error()
+            return;
 
         if len(self._ratbag.devices) > 1:
             print("Ooops, can't deal with more than one device. My bad.")
@@ -25,10 +41,6 @@ class Piper(Gtk.Window):
 
         self._profile_buttons = []
         self._current_profile = self._ratbag_device.active_profile
-
-        main_window = Gtk.Builder()
-        main_window.add_from_file("piper.ui")
-        self._builder = main_window;
 
         grid = main_window.get_object("piper-grid")
         self._init_header(self._ratbag_device)
