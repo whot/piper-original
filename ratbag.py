@@ -4,23 +4,38 @@
 from gi.repository import GLib
 from gi.repository import Gio
 
+class RatbagDBusUnavailable(BaseException):
+    pass
+
+class RatbagDBus(object):
+    def __init__(self, interface, object_path):
+        self._dbus = Gio.bus_get_sync(Gio.BusType.SYSTEM, None)
+        self._proxy = Gio.DBusProxy.new_sync(self._dbus,
+                                             Gio.DBusProxyFlags.NONE,
+                                             None,
+                                             'org.freedesktop.ratbag1',
+                                             object_path,
+                                             'org.freedesktop.ratbag1.{}'.format(interface),
+                                             None)
+        if self._proxy.get_name_owner() == None:
+            raise RatbagDBusUnavailable()
+
+    def property(self, property):
+        p = self._proxy.get_cached_property(property)
+        if p != None:
+            return p.unpack()
+        return p
+
 class Ratbag(object):
     """
     Represents a libratbag instance over dbus.
     """
     def __init__(self):
-        self._dbus = Gio.bus_get_sync(Gio.BusType.SYSTEM, None)
-        self._dbus_proxy = Gio.DBusProxy.new_sync(self._dbus,
-                                                  Gio.DBusProxyFlags.NONE,
-                                                  None,
-                                                  'org.freedesktop.ratbag1',
-                                                  '/org/freedesktop/ratbag1',
-                                                  'org.freedesktop.ratbag1.Manager',
-                                                 None)
+        self._dbus = RatbagDBus("Manager", '/org/freedesktop/ratbag1')
         self._devices = []
-        result = self._dbus_proxy.get_cached_property("Devices")
+        result = self._dbus.property("Devices")
         if result != None:
-            self._devices = [RatbagDevice(objpath) for objpath in result.unpack() or None]
+            self._devices = [RatbagDevice(objpath) for objpath in result]
 
     @property
     def devices(self):
@@ -31,24 +46,17 @@ class RatbagDevice(object):
     Represents a libratbag device
     """
     def __init__(self, object_path):
-        self._dbus = Gio.bus_get_sync(Gio.BusType.SYSTEM, None)
-        self._dbus_proxy = Gio.DBusProxy.new_sync(self._dbus,
-                                                  Gio.DBusProxyFlags.NONE,
-                                                  None,
-                                                  'org.freedesktop.ratbag1',
-                                                  object_path,
-                                                  'org.freedesktop.ratbag1.Device',
-                                                  None)
-        self._devnode = self._dbus_proxy.get_cached_property("Id").unpack()
-        self._description = self._dbus_proxy.get_cached_property("Description").unpack()
-        self._svg = self._dbus_proxy.get_cached_property("Svg").unpack()
+        self._dbus = RatbagDBus("Device", object_path)
+        self._devnode = self._dbus.property("Id")
+        self._description = self._dbus.property("Description")
+        self._svg = self._dbus.property("Svg")
 
         self._profiles = []
         self._active_profile = -1
-        result = self._dbus_proxy.get_cached_property("Profiles")
+        result = self._dbus.property("Profiles")
         if result != None:
-            self._profiles = [RatbagProfile(objpath) for objpath in result.unpack()]
-            self._active_profile = self._dbus_proxy.get_cached_property("ActiveProfile").unpack()
+            self._profiles = [RatbagProfile(objpath) for objpath in result]
+            self._active_profile = self._dbus.property("ActiveProfile")
 
     @property
     def profiles(self):
@@ -84,26 +92,19 @@ class RatbagProfile(object):
     Represents a ratbag profile
     """
     def __init__(self, object_path):
-        self._dbus = Gio.bus_get_sync(Gio.BusType.SYSTEM, None)
-        self._dbus_proxy = Gio.DBusProxy.new_sync(self._dbus,
-                                                  Gio.DBusProxyFlags.NONE,
-                                                  None,
-                                                  'org.freedesktop.ratbag1',
-                                                  object_path,
-                                                  'org.freedesktop.ratbag1.Profile',
-                                                  None)
+        self._dbus = RatbagDBus("Profile", object_path)
         self._objpath = object_path
-        self._index = self._dbus_proxy.get_cached_property("Index").unpack()
+        self._index = self._dbus.property("Index")
 
         self._resolutions = []
         self._active_resolution_idx = -1
         self._default_resolution_idx = -1
 
-        result = self._dbus_proxy.get_cached_property("Resolutions")
+        result = self._dbus.property("Resolutions")
         if result != None:
-            self._resolutions = [RatbagResolution(objpath) for objpath in result.unpack()]
-            self._active_resolution_idx = self._dbus_proxy.get_cached_property("ActiveResolution").unpack()
-            self._default_resolution_idx = self._dbus_proxy.get_cached_property("DefaultResolution").unpack()
+            self._resolutions = [RatbagResolution(objpath) for objpath in result]
+            self._active_resolution_idx = self._dbus.property("ActiveResolution")
+            self._default_resolution_idx = self._dbus.property("DefaultResolution")
 
     @property
     def index(self):
@@ -133,18 +134,11 @@ class RatbagResolution(object):
     Represents a libratbag resolution
     """
     def __init__(self, object_path):
-        self._dbus = Gio.bus_get_sync(Gio.BusType.SYSTEM, None)
-        self._dbus_proxy = Gio.DBusProxy.new_sync(self._dbus,
-                                                  Gio.DBusProxyFlags.NONE,
-                                                  None,
-                                                  'org.freedesktop.ratbag1',
-                                                  object_path,
-                                                  'org.freedesktop.ratbag1.Resolution',
-                                                  None)
-        self._index = self._dbus_proxy.get_cached_property("Index").unpack()
-        self._xres = self._dbus_proxy.get_cached_property("XResolution").unpack()
-        self._yres = self._dbus_proxy.get_cached_property("YResolution").unpack()
-        self._rate = self._dbus_proxy.get_cached_property("ReportRate").unpack()
+        self._dbus = RatbagDBus("Resolution", object_path)
+        self._index = self._dbus.property("Index")
+        self._xres = self._dbus.property("XResolution")
+        self._yres = self._dbus.property("YResolution")
+        self._rate = self._dbus.property("ReportRate")
 
     @property
     def resolution(self):
