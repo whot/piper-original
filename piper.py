@@ -9,14 +9,14 @@ from gi.repository import Gtk
 
 class Piper(Gtk.Window):
 
-    def _init_error(self):
+    def _show_error(self, message):
         box = self._builder.get_object("piper-error-box")
 
         btn = self._builder.get_object("piper-error-button")
         btn.connect("clicked", Gtk.main_quit)
 
         error = self._builder.get_object("piper-error-body-label")
-        error.set_text("Could not find any devices. Do you have anything vaguely mouse-looking plugged in?")
+        error.set_text(message)
 
         self.add(box)
 
@@ -27,9 +27,12 @@ class Piper(Gtk.Window):
         self._builder = main_window;
 
         self._ratbag = self._init_ratbag()
+        if self._ratbag == None:
+            self._show_error("Can't connect to ratbagd on DBus. That's quite unfortunate.")
+            return
         if len(self._ratbag.devices) == 0:
-            self._init_error()
-            return;
+            self._show_error("Could not find any devices. Do you have anything vaguely mouse-looking plugged in?")
+            return
 
         if len(self._ratbag.devices) > 1:
             print("Ooops, can't deal with more than one device. My bad.")
@@ -61,7 +64,10 @@ class Piper(Gtk.Window):
         self._init_buttons(main_window, self._ratbag_device)
 
     def _init_ratbag(self):
-        return Ratbag()
+        try:
+            return Ratbag()
+        except RatbagDBusUnavailable:
+            return None
 
     def  _init_header(self, device):
         hb = Gtk.HeaderBar()
