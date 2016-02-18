@@ -16,10 +16,11 @@ class Ratbag(object):
                                                   'org.freedesktop.ratbag1',
                                                   '/org/freedesktop/ratbag1',
                                                   'org.freedesktop.ratbag1.Manager',
-                                                  None)
+                                                 None)
+        self._devices = []
         result = self._dbus_proxy.get_cached_property("Devices")
-
-        self._devices = [RatbagDevice(objpath) for objpath in result.unpack()]
+        if result != None:
+            self._devices = [RatbagDevice(objpath) for objpath in result.unpack() or None]
 
     @property
     def devices(self):
@@ -42,10 +43,12 @@ class RatbagDevice(object):
         self._description = self._dbus_proxy.get_cached_property("Description").unpack()
         self._svg = self._dbus_proxy.get_cached_property("Svg").unpack()
 
-        self._active_profile = self._dbus_proxy.get_cached_property("ActiveProfile").unpack()
+        self._profiles = []
+        self._active_profile = -1
         result = self._dbus_proxy.get_cached_property("Profiles")
-
-        self._profiles = [RatbagProfile(objpath) for objpath in result.unpack()]
+        if result != None:
+            self._profiles = [RatbagProfile(objpath) for objpath in result.unpack()]
+            self._active_profile = self._dbus_proxy.get_cached_property("ActiveProfile").unpack()
 
     @property
     def profiles(self):
@@ -69,6 +72,8 @@ class RatbagDevice(object):
 
     @property
     def active_profile(self):
+        if self._active_profile == -1:
+            return None
         return self._profiles[self._active_profile]
 
     def __eq__(self, other):
@@ -90,11 +95,15 @@ class RatbagProfile(object):
         self._objpath = object_path
         self._index = self._dbus_proxy.get_cached_property("Index").unpack()
 
-        result = self._dbus_proxy.get_cached_property("Resolutions")
-        self._resolutions = [RatbagResolution(objpath) for objpath in result.unpack()]
+        self._resolutions = []
+        self._active_resolution_idx = -1
+        self._default_resolution_idx = -1
 
-        self._active_resolution_idx = self._dbus_proxy.get_cached_property("ActiveResolution").unpack()
-        self._default_resolution_idx = self._dbus_proxy.get_cached_property("DefaultResolution").unpack()
+        result = self._dbus_proxy.get_cached_property("Resolutions")
+        if result != None:
+            self._resolutions = [RatbagResolution(objpath) for objpath in result.unpack()]
+            self._active_resolution_idx = self._dbus_proxy.get_cached_property("ActiveResolution").unpack()
+            self._default_resolution_idx = self._dbus_proxy.get_cached_property("DefaultResolution").unpack()
 
     @property
     def index(self):
@@ -106,10 +115,14 @@ class RatbagProfile(object):
 
     @property
     def active_resolution(self):
+        if self._active_resolution_idx == -1:
+            return None
         return self._resolutions[self._active_resolution_idx]
 
     @property
     def default_resolution(self):
+        if self._default_resolution_idx == -1:
+            return None
         return self._resolutions[self._default_resolution_idx]
 
     def __eq__(self, other):
