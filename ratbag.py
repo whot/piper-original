@@ -58,6 +58,15 @@ class RatbagDevice(object):
             self._profiles = [RatbagProfile(objpath) for objpath in result]
             self._active_profile = self._dbus.property("ActiveProfile")
 
+        self._caps = { "CapSwitchableResolution" : False,
+                       "CapSwitchableProfile" : False,
+                       "CapButtonKeys" : False,
+                       "CapButtonMacros" : False,
+                       "CapDefaultProfile" : False,
+                       }
+        for k in self._caps.keys():
+            self._caps[k] = self._dbus.property(k)
+
     @property
     def profiles(self):
         return self._profiles
@@ -83,6 +92,26 @@ class RatbagDevice(object):
         if self._active_profile == -1:
             return None
         return self._profiles[self._active_profile]
+
+    @property
+    def has_cap_switchable_resolution(self):
+        return self._caps["CapSwitchableResolution"]
+
+    @property
+    def has_cap_switchable_profile(self):
+        return self._caps["CapSwitchableProfile"]
+
+    @property
+    def has_cap_button_keys(self):
+        return self._caps["CapButtonKeys"]
+
+    @property
+    def has_cap_button_macros(self):
+        return self._caps["CapButtonMacros"]
+
+    @property
+    def has_cap_default_macros(self):
+        return self._caps["CapDefaultProfile"]
 
     def __eq__(self, other):
         return self._objpath == other._objpath
@@ -140,6 +169,12 @@ class RatbagResolution(object):
         self._yres = self._dbus.property("YResolution")
         self._rate = self._dbus.property("ReportRate")
 
+        self._caps = { "CapIndividualReportRate" : False,
+                       "CapSeparateXYResolution" : False,
+                       }
+        for k in self._caps.keys():
+            self._caps[k] = self._dbus.property(k)
+
     @property
     def resolution(self):
         """Returns the tuple (xres, yres) with each resolution in DPI"""
@@ -148,6 +183,14 @@ class RatbagResolution(object):
     @property
     def report_rate(self):
         return self._rate
+
+    @property
+    def has_cap_individual_report_rate(self):
+        return self._caps["CapIndividualReportRate"]
+
+    @property
+    def has_cap_separate_xy_resolution(self):
+        return self._caps["CapSeparateXYResolution"]
 
     def __eq__(self, other):
         return self._objpath == other._objpath
