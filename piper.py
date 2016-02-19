@@ -115,6 +115,9 @@ class Piper(Gtk.Window):
 
         for i in range(0, 5):
             sb = builder.get_object("piper-xres-spinbutton{}".format(i + 1))
+            if i >= nres:
+                continue
+
             xres = res[i].resolution[0]
             sb.set_value(xres)
             sb.connect("value-changed", self.on_resolutions_changed)
