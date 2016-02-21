@@ -118,6 +118,7 @@ class Piper(Gtk.Window):
         for i in range(0, 5):
             sb = builder.get_object("piper-xres-spinbutton{}".format(i + 1))
             if i >= nres:
+                sb.set_visible(False)
                 continue
 
             xres = res[i].resolution[0]
@@ -127,6 +128,7 @@ class Piper(Gtk.Window):
         nres_spin = builder.get_object("piper-nresolutions-spin")
         nres_spin.connect("value-changed", self.on_nresolutions_changed, builder)
         nres_spin.set_value(nres)
+        nres_spin.set_range(1, nres)
 
     def _init_report_rate(self, builder, profile):
         # Note: we simplify here, the UI only allows one report rate and it
