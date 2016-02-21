@@ -109,6 +109,8 @@ class Piper(Gtk.Window):
                 self._profile_buttons.append(button)
             hb.pack_start(box)
 
+        hb.show_all()
+
     def _init_resolution(self, builder, profile):
         res = profile.resolutions
         nres = len(profile.resolutions)
@@ -154,6 +156,8 @@ class Piper(Gtk.Window):
         for i, b in enumerate(device.buttons):
             lbr = self._init_button_row(i)
             lb.add(lbr)
+
+        lb.show_all()
 
     def _init_button_row(self, button):
         # FIXME: can't I duplicate this from builder?
@@ -251,7 +255,7 @@ class PiperImage(Gtk.EventBox):
 def main():
     win = Piper()
     win.connect("delete-event", Gtk.main_quit)
-    win.show_all()
+    win.show()
     Gtk.main()
 
 if __name__ == '__main__':
