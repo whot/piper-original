@@ -57,6 +57,9 @@ class Piper(Gtk.Window):
         self._connect_signals()
         self._initialized = True
 
+        self.connect("delete-event", Gtk.main_quit)
+        self.show()
+
     def  _init_header(self, device):
         hb = Gtk.HeaderBar()
         hb.set_show_close_button(True)
@@ -334,8 +337,6 @@ class PiperImage(Gtk.EventBox):
 
 def main():
     win = Piper()
-    win.connect("delete-event", Gtk.main_quit)
-    win.show()
     Gtk.main()
 
 if __name__ == '__main__':
