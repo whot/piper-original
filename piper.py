@@ -41,6 +41,12 @@ class Piper(Gtk.Window):
 
         self._ratbag_device = self._ratbag.devices[0]
 
+        d = self._ratbag_device;
+        p = d.profiles
+        if len(p) == 1 and len(p[0].resolutions) == 1:
+            self._show_error("Device {} does not support switchable resolutions".format(d.description))
+            return
+
         self._profile_buttons = []
         self._current_profile = self._ratbag_device.active_profile
 
