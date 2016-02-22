@@ -41,7 +41,6 @@ class Piper(Gtk.Window):
 
         self._ratbag_device = self._ratbag.devices[0]
 
-
         self._profile_buttons = []
         self._current_profile = self._ratbag_device.active_profile
 
@@ -62,6 +61,8 @@ class Piper(Gtk.Window):
         self._init_report_rate(main_window, p)
         self._init_resolution(main_window, p)
         self._init_buttons(main_window, self._ratbag_device)
+
+        self._update_from_device()
 
     def _init_ratbag(self):
         try:
@@ -104,7 +105,6 @@ class Piper(Gtk.Window):
             for i, p in enumerate(profiles):
                 button = Gtk.ToggleButton("Profile {}".format(i))
                 button.connect("toggled", self.on_button_profile_toggled, p)
-                button.set_active(p == device.active_profile)
                 box.add(button)
                 self._profile_buttons.append(button)
             hb.pack_start(box)
@@ -115,19 +115,18 @@ class Piper(Gtk.Window):
         res = profile.resolutions
         nres = len(profile.resolutions)
 
+        self._resolution_buttons = []
+        self._resolution_adjustments = []
         for i in range(0, 5):
             sb = builder.get_object("piper-xres-spinbutton{}".format(i + 1))
-            if i >= nres:
-                sb.set_visible(False)
-                continue
-
-            xres = res[i].resolution[0]
-            sb.set_value(xres)
             sb.connect("value-changed", self.on_resolutions_changed)
+            self._resolution_buttons.append(sb)
+            adj = builder.get_object("piper-xres-adjustment{}".format(i + 1))
+            self._resolution_adjustments.append(adj)
 
         nres_spin = builder.get_object("piper-nresolutions-spin")
         nres_spin.connect("value-changed", self.on_nresolutions_changed, builder)
-        nres_spin.set_value(nres)
+        self._nres_button = nres_spin
         nres_spin.set_range(1, nres)
 
     def _init_report_rate(self, builder, profile):
@@ -138,14 +137,9 @@ class Piper(Gtk.Window):
         r1000 = builder.get_object("piper-report-rate-1000")
         r500.connect("toggled", self.on_resolution_rate_changed, 500)
         r1000.connect("toggled", self.on_resolution_rate_changed, 1000)
-        if rate == 500:
-            r500.set_active(True)
-        if rate == 1000:
-            r1000.set_active(True)
-        if rate != 500 and rate != 1000:
-            print("Ooops, rate is {} and I don't know how to deal with that.".format(rate))
-            r500.set_sensitive(False)
-            r1000.set_sensitive(False)
+
+        self._rate_buttons = { 500 : r500,
+                               1000 : r1000 }
 
     def _init_buttons(self, builder, device):
         lb = builder.get_object("piper-buttons-listbox")
@@ -202,7 +196,7 @@ class Piper(Gtk.Window):
         print("FIXME: I should save this to the device now")
 
     def on_button_reset_clicked(self, widget):
-        print("FIXME: I should reload from device now")
+        self._update_from_device()
 
     def on_button_profile_toggled(self, widget, profile):
         print("FIXME: I should switch profiles now")
@@ -222,22 +216,56 @@ class Piper(Gtk.Window):
         go to 1200, the left-most one to 200. In between they're bound by
         the previous/next one so the order is always ascending
         """
-        builder = self._builder
-        widget = builder.get_object("piper-nresolutions-spin")
-        nres = widget.get_value_as_int()
+        nres = self._nres_button.get_value_as_int() - 1
 
         min, max = 200, 12000
 
-        while nres > 0:
-            a1 = builder.get_object("piper-xres-adjustment{}".format(nres))
+        adj = self._resolution_adjustments
+        while nres >= 0:
+            a1 = adj[nres]
             a1.set_upper(max)
-            max = int(a1.get_value())
+            v = int(a1.get_value())
+            if v != 0:
+                max = v
 
-            a2 = builder.get_object("piper-xres-adjustment{}".format(nres - 1))
-            if a2:
-                a1.set_lower(a2.get_value())
+            if nres > 0:
+                a2 = adj[nres - 1]
+                min = a2.get_value()
+            else:
+                min = 200
+
+            a1.set_lower(min)
             nres -= 1
 
+    def _update_from_device(self):
+        device = self._ratbag_device
+        profile = self._current_profile
+
+        for i, b in enumerate(self._profile_buttons):
+            b.set_active(profile == device.active_profile)
+
+        rate = profile.active_resolution.report_rate
+        for r, b in self._rate_buttons.items():
+            b.set_active(r == rate)
+
+        if not rate in self._rate_buttons.keys():
+            print("Ooops, rate is {} and I don't know how to deal with that.".format(rate))
+            for b in self._rate_buttons.values():
+                b.set_sensitive(False)
+
+        res = profile.resolutions
+        nres = len(res)
+
+        for i, b in enumerate(self._resolution_buttons):
+            if i >= nres:
+                b.set_visible(False)
+                continue
+
+            xres = res[i].resolution[0]
+            b.set_value(xres)
+
+        self._nres_button.set_value(nres)
+        self._adjust_sensitivity_ranges()
 
 class PiperImage(Gtk.EventBox):
     def __init__(self, path):
