@@ -114,7 +114,6 @@ class Piper(Gtk.Window):
 
             for i, p in enumerate(profiles):
                 button = Gtk.ToggleButton("Profile {}".format(i))
-                button.connect("toggled", self.on_button_profile_toggled, p)
                 box.add(button)
                 self._profile_buttons.append(button)
             hb.pack_start(box)
@@ -195,6 +194,10 @@ class Piper(Gtk.Window):
             s.append(b.connect("value-changed", self.on_resolutions_changed, i))
 
         s.append(self._nres_button.connect("value-changed", self.on_nresolutions_changed, self._builder))
+
+        for i, b in enumerate(self._profile_buttons):
+            s.append(b.connect("toggled", self.on_button_profile_toggled, i))
+
         self._signal_ids = []
 
     def _disconnect_signals(self):
@@ -230,8 +233,7 @@ class Piper(Gtk.Window):
     def on_button_reset_clicked(self, widget):
         self._update_from_device()
 
-    def on_button_profile_toggled(self, widget, profile):
-        print("FIXME: I should switch profiles now")
+    def on_button_profile_toggled(self, widget, idx):
         if not widget.get_active():
             return
 
@@ -240,6 +242,9 @@ class Piper(Gtk.Window):
         for b in self._profile_buttons:
             if b != widget:
                 b.set_active(False)
+
+        self._current_profile = self._ratbag_device.profiles[idx]
+        self._update_from_device()
 
         if self._initialized:
             self._connect_signals()
@@ -279,7 +284,10 @@ class Piper(Gtk.Window):
         profile = self._current_profile
 
         for i, b in enumerate(self._profile_buttons):
-            b.set_active(profile == self._current_profile)
+            if device.profiles[i] == self._current_profile:
+                b.set_active(True)
+            else:
+                b.set_active(False)
 
         rate = profile.active_resolution.report_rate
         for r, b in self._rate_buttons.items():
