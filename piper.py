@@ -25,6 +25,8 @@ class Piper(Gtk.Window):
         main_window = Gtk.Builder()
         main_window.add_from_file("piper.ui")
         self._builder = main_window;
+        self._signal_ids = []
+        self._initialized = False
 
         self._ratbag = self._init_ratbag()
         if self._ratbag == None:
@@ -69,6 +71,8 @@ class Piper(Gtk.Window):
         self._init_buttons(main_window, self._ratbag_device)
 
         self._update_from_device()
+        self._connect_signals()
+        self._initialized = True
 
     def _init_ratbag(self):
         try:
@@ -125,13 +129,11 @@ class Piper(Gtk.Window):
         self._resolution_adjustments = []
         for i in range(0, 5):
             sb = builder.get_object("piper-xres-spinbutton{}".format(i + 1))
-            sb.connect("value-changed", self.on_resolutions_changed)
             self._resolution_buttons.append(sb)
             adj = builder.get_object("piper-xres-adjustment{}".format(i + 1))
             self._resolution_adjustments.append(adj)
 
         nres_spin = builder.get_object("piper-nresolutions-spin")
-        nres_spin.connect("value-changed", self.on_nresolutions_changed, builder)
         self._nres_button = nres_spin
         nres_spin.set_range(1, nres)
 
@@ -181,6 +183,28 @@ class Piper(Gtk.Window):
         lbr.add(box)
         return lbr
 
+    def _connect_signals(self):
+        """
+        Connect signals for those buttons that cause a write to the device.
+        We do this separate so we can disconnect them again before we update
+        the profile from the device. Otherwise, any widget.set_value() will
+        trigger the matching callback and tries to write to the device.
+        """
+        s = []
+        for i, b in enumerate(self._resolution_buttons):
+            s.append(b.connect("value-changed", self.on_resolutions_changed))
+
+        s.append(self._nres_button.connect("value-changed", self.on_nresolutions_changed, self._builder))
+        self._signal_ids = []
+
+    def _disconnect_signals(self):
+        """
+        Disconnect all previously connected signals.
+        """
+        for s in self._signal_ids:
+            self.disconnect(s)
+        self._signal_ids = []
+
     def on_resolution_rate_changed(self, widget, new_rate):
         if not widget.get_active():
             return
@@ -209,9 +233,14 @@ class Piper(Gtk.Window):
         if not widget.get_active():
             return
 
+        self._disconnect_signals()
+
         for b in self._profile_buttons:
             if b != widget:
                 b.set_active(False)
+
+        if self._initialized:
+            self._connect_signals()
 
     def on_button_click(self, widget, button):
         print("FIXME: I should pop down the button config window now")
