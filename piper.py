@@ -28,25 +28,8 @@ class Piper(Gtk.Window):
         self._signal_ids = []
         self._initialized = False
 
-        self._ratbag = self._init_ratbag()
-        if self._ratbag == None:
-            self._show_error("Can't connect to ratbagd on DBus. That's quite unfortunate.")
-            return
-        if len(self._ratbag.devices) == 0:
-            self._show_error("Could not find any devices. Do you have anything vaguely mouse-looking plugged in?")
-            return
-
-        if len(self._ratbag.devices) > 1:
-            print("Ooops, can't deal with more than one device. My bad.")
-            for d in self._ratbag.devices[1:]:
-                print("Ignoring device {}".format(d.description))
-
-        self._ratbag_device = self._ratbag.devices[0]
-
-        d = self._ratbag_device;
-        p = d.profiles
-        if len(p) == 1 and len(p[0].resolutions) == 1:
-            self._show_error("Device {} does not support switchable resolutions".format(d.description))
+        self._ratbag_device = self._fetch_ratbag_device()
+        if self._ratbag_device == None:
             return
 
         self._profile_buttons = []
@@ -73,12 +56,6 @@ class Piper(Gtk.Window):
         self._update_from_device()
         self._connect_signals()
         self._initialized = True
-
-    def _init_ratbag(self):
-        try:
-            return Ratbag()
-        except RatbagDBusUnavailable:
-            return None
 
     def  _init_header(self, device):
         hb = Gtk.HeaderBar()
@@ -119,6 +96,38 @@ class Piper(Gtk.Window):
             hb.pack_start(box)
 
         hb.show_all()
+
+    def _fetch_ratbag_device(self):
+        """
+        Get the first ratbag device available. If there are multiple
+        devices, an error message is printed and we default to the first
+        one.
+        Otherwise, an error is shown and we return None.
+        """
+        try:
+            ratbag = Ratbag()
+        except RatbagDBusUnavailable:
+            return None
+
+        if ratbag == None:
+            self._show_error("Can't connect to ratbagd on DBus. That's quite unfortunate.")
+            return None
+        if len(ratbag.devices) == 0:
+            self._show_error("Could not find any devices. Do you have anything vaguely mouse-looking plugged in?")
+            return None
+
+        if len(ratbag.devices) > 1:
+            print("Ooops, can't deal with more than one device. My bad.")
+            for d in ratbag.devices[1:]:
+                print("Ignoring device {}".format(d.description))
+
+        d = ratbag.devices[0]
+        p = d.profiles
+        if len(p) == 1 and len(p[0].resolutions) == 1:
+            self._show_error("Device {} does not support switchable resolutions".format(d.description))
+            return None
+
+        return d
 
     def _init_resolution(self, builder, profile):
         res = profile.resolutions

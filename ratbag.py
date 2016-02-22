@@ -118,7 +118,7 @@ class RatbagDevice(object):
         return self._caps["CapDefaultProfile"]
 
     def __eq__(self, other):
-        return self._objpath == other._objpath
+        return other and self._objpath == other._objpath
 
 class RatbagProfile(object):
     """
