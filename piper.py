@@ -279,7 +279,7 @@ class Piper(Gtk.Window):
         profile = self._current_profile
 
         for i, b in enumerate(self._profile_buttons):
-            b.set_active(profile == device.active_profile)
+            b.set_active(profile == self._current_profile)
 
         rate = profile.active_resolution.report_rate
         for r, b in self._rate_buttons.items():
