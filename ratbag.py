@@ -26,6 +26,10 @@ class RatbagDBus(object):
             return p.unpack()
         return p
 
+    def call(self, method, type, value):
+        val = GLib.Variant("({})".format(type), (value, ))
+        self._proxy.call_sync(method, val, Gio.DBusCallFlags.NO_AUTO_START, 500, None)
+
 class Ratbag(object):
     """
     Represents a libratbag instance over dbus.
@@ -183,6 +187,10 @@ class RatbagResolution(object):
     @property
     def report_rate(self):
         return self._rate
+
+    @report_rate.setter
+    def report_rate(self, rate):
+        return self._dbus.call("SetReportRate", "u", rate)
 
     @property
     def has_cap_individual_report_rate(self):

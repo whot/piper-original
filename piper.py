@@ -209,7 +209,7 @@ class Piper(Gtk.Window):
         if not widget.get_active():
             return
 
-        print("FIXME: set the report rate for all resolutions to {}".format(new_rate))
+        res = self._current_profile.active_resolution.report_rate = new_rate
 
     def on_nresolutions_changed(self, widget, builder):
         nres = widget.get_value_as_int()
