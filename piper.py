@@ -147,10 +147,6 @@ class Piper(Gtk.Window):
             r500.set_sensitive(False)
             r1000.set_sensitive(False)
 
-        c = builder.get_object("piper-resolutions-listbox").get_style_context()
-        c.set_junction_sides(Gtk.JunctionSides.BOTTOM)
-        c.set_junction_sides(Gtk.JunctionSides.TOP)
-
     def _init_buttons(self, builder, device):
         lb = builder.get_object("piper-buttons-listbox")
         lb.remove(builder.get_object("piper-button-listboxrow"))
