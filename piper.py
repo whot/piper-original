@@ -192,7 +192,7 @@ class Piper(Gtk.Window):
         """
         s = []
         for i, b in enumerate(self._resolution_buttons):
-            s.append(b.connect("value-changed", self.on_resolutions_changed))
+            s.append(b.connect("value-changed", self.on_resolutions_changed, i))
 
         s.append(self._nres_button.connect("value-changed", self.on_nresolutions_changed, self._builder))
         self._signal_ids = []
@@ -219,8 +219,10 @@ class Piper(Gtk.Window):
 
         self._adjust_sensitivity_ranges()
 
-    def on_resolutions_changed(self, widget):
+    def on_resolutions_changed(self, widget, index):
         self._adjust_sensitivity_ranges()
+        value = widget.get_value()
+        self._current_profile.resolutions[index].resolution = (value, value)
 
     def on_button_save_clicked(self, widget):
         print("FIXME: I should save this to the device now")

@@ -26,8 +26,8 @@ class RatbagDBus(object):
             return p.unpack()
         return p
 
-    def call(self, method, type, value):
-        val = GLib.Variant("({})".format(type), (value, ))
+    def call(self, method, type, *value):
+        val = GLib.Variant("({})".format(type), value )
         self._proxy.call_sync(method, val, Gio.DBusCallFlags.NO_AUTO_START, 500, None)
 
 class Ratbag(object):
@@ -183,6 +183,10 @@ class RatbagResolution(object):
     def resolution(self):
         """Returns the tuple (xres, yres) with each resolution in DPI"""
         return (self._xres, self._yres)
+
+    @resolution.setter
+    def resolution(self, res):
+        return self._dbus.call("SetResolution", "uu", *res)
 
     @property
     def report_rate(self):
