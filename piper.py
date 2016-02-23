@@ -21,6 +21,33 @@ class Piper(Gtk.Window):
         self.add(box)
         self.show()
 
+    def _show_btnmap_dialog(self, button):
+        dialog = self._builder.get_object("piper-btnmap-dialog")
+        dialog.set_transient_for(self)
+
+        sb = self._builder.get_object("piper-btnmap-btnmap-spinbutton")
+        sb.append(b.connect("value-changed", self.on_btnmap_changed, button))
+
+        response = dialog.run()
+
+        radio = self._builder.get_object("piper-btnmap-btnmap-radio")
+        if radio.get_active():
+            print("button mapping")
+
+        radio = self._builder.get_object("piper-btnmap-keymap-radio")
+        if radio.get_active():
+            print("key mapping")
+
+        radio = self._builder.get_object("piper-btnmap-keyseqmap-radio")
+        if radio.get_active():
+            print("keyseq mapping")
+
+        radio = self._builder.get_object("piper-btnmap-custommap-radio")
+        if radio.get_active():
+            print("custom mapping")
+
+        dialog.hide()
+
     def __init__(self):
         Gtk.Window.__init__(self, title="Piper")
         main_window = Gtk.Builder()
@@ -263,7 +290,10 @@ class Piper(Gtk.Window):
             self._connect_signals()
 
     def on_button_click(self, widget, button):
-        print("FIXME: I should pop down the button config window now")
+        self._show_btnmap_dialog(button)
+
+    def on_btnmap_changed(self, widget, button):
+        print("FIXME: set button to new value")
 
     def _adjust_sensitivity_ranges(self):
         """
