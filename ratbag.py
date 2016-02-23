@@ -30,14 +30,14 @@ class RatbagDBus(object):
         val = GLib.Variant("({})".format(type), value )
         self._proxy.call_sync(method, val, Gio.DBusCallFlags.NO_AUTO_START, 500, None)
 
-class Ratbag(object):
+class Ratbag(RatbagDBus):
     """
     Represents a libratbag instance over dbus.
     """
     def __init__(self):
-        self._dbus = RatbagDBus("Manager", '/org/freedesktop/ratbag1')
+        RatbagDBus.__init__(self, "Manager", '/org/freedesktop/ratbag1')
         self._devices = []
-        result = self._dbus.property("Devices")
+        result = self.property("Devices")
         if result != None:
             self._devices = [RatbagDevice(objpath) for objpath in result]
 
@@ -45,22 +45,22 @@ class Ratbag(object):
     def devices(self):
         return self._devices
 
-class RatbagDevice(object):
+class RatbagDevice(RatbagDBus):
     """
     Represents a libratbag device
     """
     def __init__(self, object_path):
-        self._dbus = RatbagDBus("Device", object_path)
-        self._devnode = self._dbus.property("Id")
-        self._description = self._dbus.property("Description")
-        self._svg = self._dbus.property("Svg")
+        RatbagDBus.__init__(self, "Device", object_path)
+        self._devnode = self.property("Id")
+        self._description = self.property("Description")
+        self._svg = self.property("Svg")
 
         self._profiles = []
         self._active_profile = -1
-        result = self._dbus.property("Profiles")
+        result = self.property("Profiles")
         if result != None:
             self._profiles = [RatbagProfile(objpath) for objpath in result]
-            self._active_profile = self._dbus.property("ActiveProfile")
+            self._active_profile = self.property("ActiveProfile")
 
         self._caps = { "CapSwitchableResolution" : False,
                        "CapSwitchableProfile" : False,
@@ -69,7 +69,7 @@ class RatbagDevice(object):
                        "CapDefaultProfile" : False,
                        }
         for k in self._caps.keys():
-            self._caps[k] = self._dbus.property(k)
+            self._caps[k] = self.property(k)
 
     @property
     def profiles(self):
@@ -120,24 +120,24 @@ class RatbagDevice(object):
     def __eq__(self, other):
         return other and self._objpath == other._objpath
 
-class RatbagProfile(object):
+class RatbagProfile(RatbagDBus):
     """
     Represents a ratbag profile
     """
     def __init__(self, object_path):
-        self._dbus = RatbagDBus("Profile", object_path)
+        RatbagDBus.__init__(self, "Profile", object_path)
         self._objpath = object_path
-        self._index = self._dbus.property("Index")
+        self._index = self.property("Index")
 
         self._resolutions = []
         self._active_resolution_idx = -1
         self._default_resolution_idx = -1
 
-        result = self._dbus.property("Resolutions")
+        result = self.property("Resolutions")
         if result != None:
             self._resolutions = [RatbagResolution(objpath) for objpath in result]
-            self._active_resolution_idx = self._dbus.property("ActiveResolution")
-            self._default_resolution_idx = self._dbus.property("DefaultResolution")
+            self._active_resolution_idx = self.property("ActiveResolution")
+            self._default_resolution_idx = self.property("DefaultResolution")
 
     @property
     def index(self):
@@ -162,22 +162,22 @@ class RatbagProfile(object):
     def __eq__(self, other):
         return self._objpath == other._objpath
 
-class RatbagResolution(object):
+class RatbagResolution(RatbagDBus):
     """
     Represents a libratbag resolution
     """
     def __init__(self, object_path):
-        self._dbus = RatbagDBus("Resolution", object_path)
-        self._index = self._dbus.property("Index")
-        self._xres = self._dbus.property("XResolution")
-        self._yres = self._dbus.property("YResolution")
-        self._rate = self._dbus.property("ReportRate")
+        RatbagDBus.__init__(self, "Resolution", object_path)
+        self._index = self.property("Index")
+        self._xres = self.property("XResolution")
+        self._yres = self.property("YResolution")
+        self._rate = self.property("ReportRate")
 
         self._caps = { "CapIndividualReportRate" : False,
                        "CapSeparateXYResolution" : False,
                        }
         for k in self._caps.keys():
-            self._caps[k] = self._dbus.property(k)
+            self._caps[k] = self.property(k)
 
     @property
     def resolution(self):
@@ -186,7 +186,7 @@ class RatbagResolution(object):
 
     @resolution.setter
     def resolution(self, res):
-        return self._dbus.call("SetResolution", "uu", *res)
+        return self.call("SetResolution", "uu", *res)
 
     @property
     def report_rate(self):
@@ -194,7 +194,7 @@ class RatbagResolution(object):
 
     @report_rate.setter
     def report_rate(self, rate):
-        return self._dbus.call("SetReportRate", "u", rate)
+        return self.call("SetReportRate", "u", rate)
 
     @property
     def has_cap_individual_report_rate(self):
