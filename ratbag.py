@@ -76,10 +76,6 @@ class RatbagDevice(RatbagDBus):
         return self._profiles
 
     @property
-    def buttons(self):
-        return range(1, 14)
-
-    @property
     def description(self):
         return self._description
 
@@ -132,12 +128,17 @@ class RatbagProfile(RatbagDBus):
         self._resolutions = []
         self._active_resolution_idx = -1
         self._default_resolution_idx = -1
+        self._buttons = []
 
         result = self.property("Resolutions")
         if result != None:
             self._resolutions = [RatbagResolution(objpath) for objpath in result]
             self._active_resolution_idx = self.property("ActiveResolution")
             self._default_resolution_idx = self.property("DefaultResolution")
+
+        result = self.property("Buttons")
+        if result != None:
+            self._buttons = [RatbagButton(objpath) for objpath in result]
 
     @property
     def index(self):
@@ -158,6 +159,10 @@ class RatbagProfile(RatbagDBus):
         if self._default_resolution_idx == -1:
             return None
         return self._resolutions[self._default_resolution_idx]
+
+    @property
+    def buttons(self):
+        return self._buttons
 
     def __eq__(self, other):
         return self._objpath == other._objpath
@@ -206,6 +211,14 @@ class RatbagResolution(RatbagDBus):
 
     def __eq__(self, other):
         return self._objpath == other._objpath
+
+class RatbagButton(RatbagDBus):
+    """
+    Represents a libratbag button
+    """
+    def __init__(self, object_path):
+        RatbagDBus.__init__(self, "Button", object_path)
+        self._index = self.property("Index")
 
 def print_all_devices(ratbag):
     for d in ratbag.devices:

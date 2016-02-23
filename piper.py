@@ -79,7 +79,7 @@ class Piper(Gtk.Window):
         p = self._current_profile
         self._init_report_rate(main_window, p)
         self._init_resolution(main_window, p)
-        self._init_buttons(main_window, self._ratbag_device)
+        self._init_buttons(main_window, p)
 
         self._update_from_device()
         self._connect_signals()
@@ -188,11 +188,11 @@ class Piper(Gtk.Window):
         self._rate_buttons = { 500 : r500,
                                1000 : r1000 }
 
-    def _init_buttons(self, builder, device):
+    def _init_buttons(self, builder, profile):
         lb = builder.get_object("piper-buttons-listbox")
         lb.remove(builder.get_object("piper-button-listboxrow"))
 
-        for i, b in enumerate(device.buttons):
+        for i, b in enumerate(profile.buttons):
             lbr = self._init_button_row(i)
             lb.add(lbr)
 
