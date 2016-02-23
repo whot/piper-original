@@ -19,6 +19,7 @@ class Piper(Gtk.Window):
         error.set_text(message)
 
         self.add(box)
+        self.show()
 
     def __init__(self):
         Gtk.Window.__init__(self, title="Piper")
@@ -110,7 +111,7 @@ class Piper(Gtk.Window):
         try:
             ratbag = Ratbag()
         except RatbagDBusUnavailable:
-            return None
+            ratbag = None
 
         if ratbag == None:
             self._show_error("Can't connect to ratbagd on DBus. That's quite unfortunate.")
