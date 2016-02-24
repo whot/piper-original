@@ -31,23 +31,19 @@ class Piper(Gtk.Window):
         c = self._builder.get_object("piper-btnmap-custommap-combo")
         c.connect("changed", self.on_custommap_changed, button)
 
-        response = dialog.run()
-
         radio = self._builder.get_object("piper-btnmap-btnmap-radio")
-        if radio.get_active():
-            print("button mapping")
+        radio.set_active(button.action_type == "button")
 
         radio = self._builder.get_object("piper-btnmap-keymap-radio")
-        if radio.get_active():
-            print("key mapping")
+        radio.set_active(button.action_type == "key")
 
         radio = self._builder.get_object("piper-btnmap-keyseqmap-radio")
-        if radio.get_active():
-            print("keyseq mapping")
+        radio.set_active(button.action_type == "macro")
 
         radio = self._builder.get_object("piper-btnmap-custommap-radio")
-        if radio.get_active():
-            print("custom mapping")
+        radio.set_active(button.action_type == "special")
+
+        response = dialog.run()
 
         dialog.hide()
 

@@ -226,6 +226,14 @@ class RatbagButton(RatbagDBus):
         return self._index
 
     @property
+    def button_type(self):
+        return self.property("Type")
+
+    @property
+    def action_type(self):
+        return self.property("ActionType")
+
+    @property
     def special(self):
         self._special = self.property("SpecialMapping")
         return self._special
