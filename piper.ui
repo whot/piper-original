@@ -767,7 +767,6 @@
                     <child>
                       <object class="GtkListBoxRow" id="piper-btnmap-btnmap-listboxrow">
                         <property name="width_request">100</property>
-                        <property name="height_request">80</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="activatable">False</property>
