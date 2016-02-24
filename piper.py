@@ -26,7 +26,10 @@ class Piper(Gtk.Window):
         dialog.set_transient_for(self)
 
         sb = self._builder.get_object("piper-btnmap-btnmap-spinbutton")
-        sb.append(b.connect("value-changed", self.on_btnmap_changed, button))
+        sb.connect("value-changed", self.on_btnmap_changed, button)
+
+        c = self._builder.get_object("piper-btnmap-custommap-combo")
+        c.connect("changed", self.on_custommap_changed, button)
 
         response = dialog.run()
 
@@ -193,7 +196,7 @@ class Piper(Gtk.Window):
         lb.remove(builder.get_object("piper-button-listboxrow"))
 
         for i, b in enumerate(profile.buttons):
-            lbr = self._init_button_row(i)
+            lbr = self._init_button_row(b)
             lb.add(lbr)
 
         lb.show_all()
@@ -204,7 +207,7 @@ class Piper(Gtk.Window):
         lbr.height_request = 80
         lbr.width_request = 100
         box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        l1 = Gtk.Label("Button {}".format(button))
+        l1 = Gtk.Label("Button {}".format(button.index))
         l1.set_margin_left(12)
         l1.set_margin_top(8)
         l1.set_margin_bottom(8)
@@ -294,6 +297,17 @@ class Piper(Gtk.Window):
 
     def on_btnmap_changed(self, widget, button):
         print("FIXME: set button to new value")
+
+    def on_custommap_changed(self, widget, button):
+        radio = self._builder.get_object("piper-btnmap-custommap-radio")
+        radio.set_active(True)
+
+        combo = self._builder.get_object("piper-btnmap-custommap-combo")
+        tree_iter = combo.get_active_iter()
+        if tree_iter != None:
+            model = combo.get_model()
+            val = model[tree_iter][1]
+            button.special = val
 
     def _adjust_sensitivity_ranges(self):
         """

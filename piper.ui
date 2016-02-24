@@ -8,241 +8,79 @@
     <property name="step_increment">1</property>
     <property name="page_increment">5</property>
   </object>
-  <object class="GtkDialog" id="piper-btnmap-dialog">
-    <property name="can_focus">False</property>
-    <property name="title" translatable="yes">Map Button</property>
-    <property name="default_width">600</property>
-    <property name="default_height">400</property>
-    <property name="type_hint">dialog</property>
-    <child internal-child="vbox">
-      <object class="GtkBox" id="piper-btnmap-vbox">
-        <property name="can_focus">False</property>
-        <property name="margin_left">12</property>
-        <property name="margin_right">12</property>
-        <property name="margin_top">12</property>
-        <property name="margin_bottom">12</property>
-        <property name="orientation">vertical</property>
-        <property name="spacing">2</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox" id="piper-btnmap-actionarea">
-            <property name="can_focus">False</property>
-            <property name="layout_style">end</property>
-            <child>
-              <object class="GtkButton" id="piper-btnmap-close-button">
-                <property name="label">gtk-close</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_stock">True</property>
-                <property name="yalign">0.62000000476837158</property>
-              </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">False</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkBox" id="piper-btnmap-vbox2">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="orientation">vertical</property>
-            <child>
-              <object class="GtkLabel" id="piper-btnmap-mapping-label">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="ypad">12</property>
-                <property name="label" translatable="yes">Button 0 Mapping</property>
-                <property name="xalign">0</property>
-                <attributes>
-                  <attribute name="weight" value="bold"/>
-                </attributes>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkBox" id="piper-btnmap-options-vbox">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="orientation">vertical</property>
-                <child>
-                  <object class="GtkRadioButton" id="piper-btnmap-btnmap-radio">
-                    <property name="label" translatable="yes">Button mapping</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">False</property>
-                    <property name="xalign">0</property>
-                    <property name="active">True</property>
-                    <property name="draw_indicator">True</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">0</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkListBox" id="piper-btnmap-btnmap-listbox">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <child>
-                      <object class="GtkListBoxRow" id="piper-btnmap-btnmap-listboxrow">
-                        <property name="width_request">100</property>
-                        <property name="height_request">80</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="activatable">False</property>
-                        <property name="selectable">False</property>
-                        <child>
-                          <object class="GtkBox" id="piper-btnmap-btnmap-box">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="valign">center</property>
-                            <child>
-                              <object class="GtkLabel" id="piper-btnmap-btnmap-label">
-                                <property name="height_request">32</property>
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="halign">start</property>
-                                <property name="margin_left">12</property>
-                                <property name="margin_start">12</property>
-                                <property name="margin_top">8</property>
-                                <property name="margin_bottom">8</property>
-                                <property name="hexpand">True</property>
-                                <property name="label" translatable="yes">Button number</property>
-                                <property name="use_underline">True</property>
-                                <property name="mnemonic_widget">piper-button-button1</property>
-                                <property name="xalign">0</property>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkSpinButton" id="piper-btnmap-btnmap-spinbutton">
-                                <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="input_purpose">alpha</property>
-                                <property name="adjustment">piper-btnmap-btnmap-adjustment</property>
-                                <property name="climb_rate">1</property>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">2</property>
-                              </packing>
-                            </child>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">1</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkRadioButton" id="piper-btnmap-keymap-radio">
-                    <property name="label" translatable="yes">Key mapping</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">False</property>
-                    <property name="xalign">0</property>
-                    <property name="active">True</property>
-                    <property name="draw_indicator">True</property>
-                    <property name="group">piper-btnmap-btnmap-radio</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">2</property>
-                  </packing>
-                </child>
-                <child>
-                  <placeholder/>
-                </child>
-                <child>
-                  <object class="GtkRadioButton" id="piper-btnmap-keyseqmap-radio">
-                    <property name="label" translatable="yes">Key sequence</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">False</property>
-                    <property name="xalign">0</property>
-                    <property name="active">True</property>
-                    <property name="draw_indicator">True</property>
-                    <property name="group">piper-btnmap-btnmap-radio</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">4</property>
-                  </packing>
-                </child>
-                <child>
-                  <placeholder/>
-                </child>
-                <child>
-                  <object class="GtkRadioButton" id="piper-btnmap-custommap-radio">
-                    <property name="label" translatable="yes">Custom function</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">False</property>
-                    <property name="xalign">0</property>
-                    <property name="active">True</property>
-                    <property name="draw_indicator">True</property>
-                    <property name="group">piper-btnmap-btnmap-radio</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">6</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkComboBox" id="piper-btnmap-custommap-combo">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">7</property>
-                  </packing>
-                </child>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
-          </packing>
-        </child>
-      </object>
-    </child>
-    <action-widgets>
-      <action-widget response="1">piper-btnmap-close-button</action-widget>
-    </action-widgets>
+  <object class="GtkListStore" id="piper-btnmap-custommap-liststore">
+    <columns>
+      <!-- column-name label -->
+      <column type="gchararray"/>
+      <!-- column-name key -->
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0" translatable="yes">None</col>
+        <col id="1" translatable="yes">none</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Doubleclick</col>
+        <col id="1" translatable="yes">doubleclick</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Wheel Left</col>
+        <col id="1" translatable="yes">wheel-left</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Wheel Right</col>
+        <col id="1" translatable="yes">wheel-right</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Wheel Up</col>
+        <col id="1" translatable="yes">wheel-up</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes" context="Wheel Down">Wheel Down</col>
+        <col id="1" translatable="yes">wheel-down</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Ratchet Mode Switch</col>
+        <col id="1" translatable="yes">ratchet-mode-switch</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Resolution Cycle Up</col>
+        <col id="1" translatable="yes">resolution-cycle-up</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Resolution Up</col>
+        <col id="1" translatable="yes">Resolution Down</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Resolution Switch</col>
+        <col id="1" translatable="yes">resolution-alternate</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Resolution Default</col>
+        <col id="1" translatable="yes">resolution-default</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Profile Cycle Up</col>
+        <col id="1" translatable="yes">profile-cycle-up</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Profile Up</col>
+        <col id="1" translatable="yes">profile-up</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Profile Down</col>
+        <col id="1" translatable="yes">profile-down</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Second Mode</col>
+        <col id="1" translatable="yes">second-mode</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Battery Level</col>
+        <col id="1" translatable="yes">battery-level</col>
+      </row>
+    </data>
   </object>
   <object class="GtkBox" id="piper-error-box">
     <property name="width_request">300</property>
@@ -837,5 +675,250 @@
         <property name="top_attach">0</property>
       </packing>
     </child>
+  </object>
+  <object class="GtkDialog" id="piper-btnmap-dialog">
+    <property name="can_focus">False</property>
+    <property name="title" translatable="yes">Map Button</property>
+    <property name="default_width">600</property>
+    <property name="default_height">400</property>
+    <property name="type_hint">dialog</property>
+    <child internal-child="vbox">
+      <object class="GtkBox" id="piper-btnmap-vbox">
+        <property name="can_focus">False</property>
+        <property name="margin_left">12</property>
+        <property name="margin_right">12</property>
+        <property name="margin_top">12</property>
+        <property name="margin_bottom">12</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox" id="piper-btnmap-actionarea">
+            <property name="can_focus">False</property>
+            <property name="layout_style">end</property>
+            <child>
+              <object class="GtkButton" id="piper-btnmap-close-button">
+                <property name="label">gtk-close</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_stock">True</property>
+                <property name="yalign">0.62000000476837158</property>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkBox" id="piper-btnmap-vbox2">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="orientation">vertical</property>
+            <child>
+              <object class="GtkLabel" id="piper-btnmap-mapping-label">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="ypad">12</property>
+                <property name="label" translatable="yes">Button 0 Mapping</property>
+                <property name="xalign">0</property>
+                <attributes>
+                  <attribute name="weight" value="bold"/>
+                </attributes>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkBox" id="piper-btnmap-options-vbox">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="orientation">vertical</property>
+                <child>
+                  <object class="GtkRadioButton" id="piper-btnmap-btnmap-radio">
+                    <property name="label" translatable="yes">Button mapping</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">False</property>
+                    <property name="xalign">0</property>
+                    <property name="active">True</property>
+                    <property name="draw_indicator">True</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkListBox" id="piper-btnmap-btnmap-listbox">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="GtkListBoxRow" id="piper-btnmap-btnmap-listboxrow">
+                        <property name="width_request">100</property>
+                        <property name="height_request">80</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="activatable">False</property>
+                        <property name="selectable">False</property>
+                        <child>
+                          <object class="GtkBox" id="piper-btnmap-btnmap-box">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="valign">center</property>
+                            <child>
+                              <object class="GtkLabel" id="piper-btnmap-btnmap-label">
+                                <property name="height_request">32</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="halign">start</property>
+                                <property name="margin_left">12</property>
+                                <property name="margin_start">12</property>
+                                <property name="margin_top">8</property>
+                                <property name="margin_bottom">8</property>
+                                <property name="hexpand">True</property>
+                                <property name="label" translatable="yes">Button number</property>
+                                <property name="use_underline">True</property>
+                                <property name="mnemonic_widget">piper-button-button1</property>
+                                <property name="xalign">0</property>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkSpinButton" id="piper-btnmap-btnmap-spinbutton">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="input_purpose">alpha</property>
+                                <property name="adjustment">piper-btnmap-btnmap-adjustment</property>
+                                <property name="climb_rate">1</property>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">2</property>
+                              </packing>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkRadioButton" id="piper-btnmap-keymap-radio">
+                    <property name="label" translatable="yes">Key mapping</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">False</property>
+                    <property name="xalign">0</property>
+                    <property name="active">True</property>
+                    <property name="draw_indicator">True</property>
+                    <property name="group">piper-btnmap-btnmap-radio</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <object class="GtkRadioButton" id="piper-btnmap-keyseqmap-radio">
+                    <property name="label" translatable="yes">Key sequence</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">False</property>
+                    <property name="xalign">0</property>
+                    <property name="active">True</property>
+                    <property name="draw_indicator">True</property>
+                    <property name="group">piper-btnmap-btnmap-radio</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">4</property>
+                  </packing>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <object class="GtkRadioButton" id="piper-btnmap-custommap-radio">
+                    <property name="label" translatable="yes">Custom function</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">False</property>
+                    <property name="xalign">0</property>
+                    <property name="active">True</property>
+                    <property name="draw_indicator">True</property>
+                    <property name="group">piper-btnmap-btnmap-radio</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">6</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkComboBox" id="piper-btnmap-custommap-combo">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="model">piper-btnmap-custommap-liststore</property>
+                    <property name="has_entry">True</property>
+                    <property name="entry_text_column">0</property>
+                    <property name="id_column">0</property>
+                    <child internal-child="entry">
+                      <object class="GtkEntry" id="combobox-entry">
+                        <property name="can_focus">False</property>
+                      </object>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">7</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+    <action-widgets>
+      <action-widget response="1">piper-btnmap-close-button</action-widget>
+    </action-widgets>
   </object>
 </interface>
