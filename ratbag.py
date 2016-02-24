@@ -219,6 +219,41 @@ class RatbagButton(RatbagDBus):
     def __init__(self, object_path):
         RatbagDBus.__init__(self, "Button", object_path)
         self._index = self.property("Index")
+        self._button = self.property("ButtonMapping")
+
+    @property
+    def index(self):
+        return self._index
+
+    @property
+    def special(self):
+        self._special = self.property("SpecialMapping")
+        return self._special
+
+    @special.setter
+    def special(self, special):
+        return self.call("SetSpecialMapping", "s", special)
+
+    @property
+    def key(self):
+        self._key = self.property("KeyMapping")
+        return self._key
+
+    @key.setter
+    def key(self, key, modifiers):
+        return self.call("SetKeyMapping", "au", [key].append(modifiers))
+
+    @property
+    def button(self):
+        self._button = self.property("ButtonMapping")
+        return self._button
+
+    @button.setter
+    def button(self, button):
+        return self.call("SetButtonMapping", "u", button)
+
+    def disable(self):
+        return self.call("Disable", "")
 
 def print_all_devices(ratbag):
     for d in ratbag.devices:
