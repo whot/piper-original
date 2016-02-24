@@ -32,15 +32,19 @@ class Piper(Gtk.Window):
         c.connect("changed", self.on_custommap_changed, button)
 
         radio = self._builder.get_object("piper-btnmap-btnmap-radio")
+        radio.connect("toggled", self.on_actiontype_changed_button, button)
         radio.set_active(button.action_type == "button")
 
         radio = self._builder.get_object("piper-btnmap-keymap-radio")
+        radio.connect("toggled", self.on_actiontype_changed_key, button)
         radio.set_active(button.action_type == "key")
 
         radio = self._builder.get_object("piper-btnmap-keyseqmap-radio")
+        radio.connect("toggled", self.on_actiontype_changed_macro, button)
         radio.set_active(button.action_type == "macro")
 
         radio = self._builder.get_object("piper-btnmap-custommap-radio")
+        radio.connect("toggled", self.on_actiontype_changed_special, button)
         radio.set_active(button.action_type == "special")
 
         response = dialog.run()
@@ -294,15 +298,43 @@ class Piper(Gtk.Window):
     def on_btnmap_changed(self, widget, button):
         print("FIXME: set button to new value")
 
-    def on_custommap_changed(self, widget, button):
-        radio = self._builder.get_object("piper-btnmap-custommap-radio")
-        radio.set_active(True)
-
+    def _custommap_combo_value(self):
         combo = self._builder.get_object("piper-btnmap-custommap-combo")
         tree_iter = combo.get_active_iter()
         if tree_iter != None:
             model = combo.get_model()
             val = model[tree_iter][1]
+            return val
+        return None
+
+    def on_custommap_changed(self, widget, button):
+        radio = self._builder.get_object("piper-btnmap-custommap-radio")
+        radio.set_active(True)
+
+        val = self._custommap_combo_value()
+        if val:
+            button.special = val
+
+    def on_actiontype_changed_button(self, widget, button):
+        if not widget.get_active():
+            return
+
+        b = self._builder.get_object("piper-btnmap-btnmap-spinbutton").get_value_as_int()
+        button.button = b
+
+    def on_actiontype_changed_key(self, widget, button):
+        if not widget.get_active():
+            return
+        print("FIXME: change to key")
+
+    def on_actiontype_changed_macro(self, widget, button):
+        if not widget.get_active():
+            return
+        print("FIXME: change to macro")
+
+    def on_actiontype_changed_special(self, widget, button):
+        val = self._custommap_combo_value()
+        if val:
             button.special = val
 
     def _adjust_sensitivity_ranges(self):
