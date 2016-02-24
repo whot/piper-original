@@ -29,6 +29,17 @@ class Piper(Gtk.Window):
         sb.connect("value-changed", self.on_btnmap_changed, button)
 
         c = self._builder.get_object("piper-btnmap-custommap-combo")
+        # select the currently selected function
+        tree = c.get_model()
+        it = tree.get_iter_first()
+        c.set_active_iter(it)
+        while it:
+            v = button.special
+            if tree.get_value(it, 1) == v:
+                c.set_active_iter(it)
+                break;
+            it = tree.iter_next(it)
+
         c.connect("changed", self.on_custommap_changed, button)
 
         radio = self._builder.get_object("piper-btnmap-btnmap-radio")
