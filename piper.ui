@@ -50,7 +50,11 @@
       </row>
       <row>
         <col id="0" translatable="yes">Resolution Up</col>
-        <col id="1" translatable="yes">Resolution Down</col>
+        <col id="1" translatable="yes">resolution-up</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Resolution Down</col>
+        <col id="1" translatable="yes">resolution-down</col>
       </row>
       <row>
         <col id="0" translatable="yes">Resolution Switch</col>
