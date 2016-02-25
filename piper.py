@@ -60,6 +60,8 @@ class Piper(Gtk.Window):
 
         response = dialog.run()
 
+        self._update_from_device()
+
         dialog.hide()
 
     def __init__(self):
