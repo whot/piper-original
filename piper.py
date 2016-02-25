@@ -258,16 +258,13 @@ class Piper(Gtk.Window):
                 c = self._builder.get_object("piper-btnmap-custommap-combo")
                 tree = c.get_model()
                 it = tree.get_iter_first()
-                c.set_active_iter(it)
                 while it:
                     if tree.get_value(it, 1) == v:
-                        c.set_active_iter(it)
+                        text = "{}".format(tree[it][0])
                         break;
                     it = tree.iter_next(it)
 
-                if it != None:
-                    text = "{}".format(tree[it][0])
-                else:
+                if it == None:
                     text = "Unknown special {}".format(v)
             else:
                 text = "!help, I'm confused!"
