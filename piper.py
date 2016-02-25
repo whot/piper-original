@@ -345,7 +345,8 @@ class Piper(Gtk.Window):
         self._show_btnmap_dialog(button)
 
     def on_btnmap_changed(self, widget, button):
-        print("FIXME: set button to new value")
+        b = self._builder.get_object("piper-btnmap-btnmap-spinbutton").get_value_as_int()
+        button.button = b
 
     def _custommap_combo_value(self):
         combo = self._builder.get_object("piper-btnmap-custommap-combo")
