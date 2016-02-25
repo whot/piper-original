@@ -60,6 +60,8 @@ class Piper(Gtk.Window):
 
         response = dialog.run()
 
+        self._update_from_device()
+
         dialog.hide()
 
     def __init__(self):
@@ -69,6 +71,7 @@ class Piper(Gtk.Window):
         self._builder = main_window;
         self._signal_ids = []
         self._initialized = False
+        self._button_function_labels = []
 
         self._ratbag_device = self._fetch_ratbag_device()
         if self._ratbag_device == None:
@@ -210,6 +213,8 @@ class Piper(Gtk.Window):
             lbr = self._init_button_row(b)
             lb.add(lbr)
 
+        self._set_button_row_function_labels(profile)
+
         lb.show_all()
 
     def _init_button_row(self, button):
@@ -218,23 +223,56 @@ class Piper(Gtk.Window):
         lbr.height_request = 80
         lbr.width_request = 100
         box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        l1 = Gtk.Label("Button {}".format(button.index))
+        l1 = Gtk.Label()
+        l1.set_markup("<b>Button {}</b>".format(button.index))
         l1.set_margin_left(12)
         l1.set_margin_top(8)
         l1.set_margin_bottom(8)
         l1.height_request = 32
         box.add(l1)
 
-        l2 = Gtk.Label()
-        l2.set_markup("<b>Button 1 click</b>")
+        l2 = Gtk.Label("...function...")
+        l2.set_justify(Gtk.Justification.LEFT)
         l2.set_hexpand(True)
+        l2.set_margin_left(12)
+        l2.set_xalign(0)
         box.add(l2)
+        self._button_function_labels.append(l2)
 
         btn = Gtk.Button("...")
         btn.connect("clicked", self.on_button_click, button)
         box.add(btn)
         lbr.add(box)
         return lbr
+
+    def _set_button_row_function_labels(self, profile):
+        buttons = profile.buttons
+        for l, button in zip(self._button_function_labels, buttons):
+            action = button.action_type
+            if action == "button":
+                text = "Button {} click".format(button.button)
+            elif action == "key":
+                text = "Key event: {}".format(button.key[0])
+            elif action == "macro":
+                text = "Macro (unsupported, sorry)"
+            elif action == "special":
+                v = button.special
+                c = self._builder.get_object("piper-btnmap-custommap-combo")
+                tree = c.get_model()
+                it = tree.get_iter_first()
+                while it:
+                    if tree.get_value(it, 1) == v:
+                        text = "{}".format(tree[it][0])
+                        break;
+                    it = tree.iter_next(it)
+
+                if it == None:
+                    text = "Unknown special {}".format(v)
+            else:
+                text = "!help, I'm confused!"
+
+            l.set_text(text)
+
 
     def _connect_signals(self):
         """
@@ -407,6 +445,7 @@ class Piper(Gtk.Window):
 
         self._nres_button.set_value(nres)
         self._adjust_sensitivity_ranges()
+        self._set_button_row_function_labels(profile)
 
 class PiperImage(Gtk.EventBox):
     def __init__(self, path):
