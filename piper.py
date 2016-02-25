@@ -32,13 +32,14 @@ class Piper(Gtk.Window):
         # select the currently selected function
         tree = c.get_model()
         it = tree.get_iter_first()
-        c.set_active_iter(it)
         while it:
             v = button.special
             if tree.get_value(it, 1) == v:
                 c.set_active_iter(it)
                 break;
             it = tree.iter_next(it)
+        if it == None:
+            c.set_active_iter(tree.get_iter_first())
 
         c.connect("changed", self.on_custommap_changed, button)
 
