@@ -2,6 +2,8 @@
 # vim: set expandtab shiftwidth=4 tabstop=4
 
 from ratbag import *
+import sysconfig
+import os
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -86,12 +88,12 @@ class Piper(Gtk.Window):
         self.add(grid)
 
         # load the right image
-        # FIXME: libratbag images need to be scaled into the available
-        # space, disable for now
-        # svg = self._ratbag_device.svg
-        # svg = "/opt/libratbag/share/libratbag/{}".format(svg)
-        # img = main_window.get_object("piper-image-device")
-        # img.set_from_file(svg)
+        svg = self._ratbag_device.svg
+        svg = "{}/libratbag/{}".format(sysconfig.get_config_var("datarootdir"), svg)
+        if not os.path.isfile(svg):
+            svg = "404.svg"
+        img = main_window.get_object("piper-image-device")
+        img.set_from_file(svg)
 
         # init the current profile's data
         p = self._current_profile
