@@ -3,6 +3,13 @@ Piper
 
 GTK application to configure gaming mice. Piper uses libratbag via ratbagd.
 
+Dependencies
+============
+
+piper requires ratbagd's python bindings. These are currently installed via
+autotools so setuptools won't find them. You'll have to rely on your
+distribution packaging for now.
+
 License
 =======
 
