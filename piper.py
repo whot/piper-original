@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # vim: set expandtab shiftwidth=4 tabstop=4
 
-from ratbag import *
+from ratbagd import *
 import sysconfig
 import os
 
@@ -156,8 +156,8 @@ class Piper(Gtk.Window):
         Otherwise, an error is shown and we return None.
         """
         try:
-            ratbag = Ratbag()
-        except RatbagDBusUnavailable:
+            ratbag = Ratbagd()
+        except RatbagdDBusUnavailable:
             ratbag = None
 
         if ratbag == None:
