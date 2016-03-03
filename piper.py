@@ -88,8 +88,7 @@ class Piper(Gtk.Window):
         self.add(grid)
 
         # load the right image
-        svg = self._ratbag_device.svg
-        svg = "{}/libratbag/{}".format(sysconfig.get_config_var("datarootdir"), svg)
+        svg = self._ratbag_device.svg_path
         if not os.path.isfile(svg):
             svg = "404.svg"
         img = main_window.get_object("piper-image-device")
