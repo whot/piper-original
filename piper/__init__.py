@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 # vim: set expandtab shiftwidth=4 tabstop=4
 
-from ratbag import *
-import sysconfig
+from ratbagd import *
 import os
+import pkg_resources
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -70,7 +70,7 @@ class Piper(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self, title="Piper")
         main_window = Gtk.Builder()
-        main_window.add_from_file("piper.ui")
+        main_window.add_from_file(pkg_resources.resource_filename("piper", "piper.ui"))
         self._builder = main_window;
         self._signal_ids = []
         self._initialized = False
@@ -88,10 +88,9 @@ class Piper(Gtk.Window):
         self.add(grid)
 
         # load the right image
-        svg = self._ratbag_device.svg
-        svg = "{}/libratbag/{}".format(sysconfig.get_config_var("datarootdir"), svg)
+        svg = self._ratbag_device.svg_path
         if not os.path.isfile(svg):
-            svg = "404.svg"
+            svg = pkg_resources.resource_filename("piper", "404.svg")
         img = main_window.get_object("piper-image-device")
         img.set_from_file(svg)
 
@@ -156,8 +155,8 @@ class Piper(Gtk.Window):
         Otherwise, an error is shown and we return None.
         """
         try:
-            ratbag = Ratbag()
-        except RatbagDBusUnavailable:
+            ratbag = Ratbagd()
+        except RatbagdDBusUnavailable:
             ratbag = None
 
         if ratbag == None:
