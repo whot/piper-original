@@ -2,8 +2,8 @@
 # vim: set expandtab shiftwidth=4 tabstop=4
 
 from ratbagd import *
-import sysconfig
 import os
+import pkg_resources
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -70,7 +70,7 @@ class Piper(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self, title="Piper")
         main_window = Gtk.Builder()
-        main_window.add_from_file("piper.ui")
+        main_window.add_from_file(pkg_resources.resource_filename("piper", "piper.ui"))
         self._builder = main_window;
         self._signal_ids = []
         self._initialized = False
@@ -90,7 +90,7 @@ class Piper(Gtk.Window):
         # load the right image
         svg = self._ratbag_device.svg_path
         if not os.path.isfile(svg):
-            svg = "404.svg"
+            svg = pkg_resources.resource_filename("piper", "404.svg")
         img = main_window.get_object("piper-image-device")
         img.set_from_file(svg)
 
