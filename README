@@ -3,6 +3,35 @@ Piper
 
 GTK application to configure gaming mice. Piper uses libratbag via ratbagd.
 
+Dependencies
+============
+
+Piper uses the ratbagd Python bindings. It doesn't require ratbagd itself to
+be running, but well, it'll be a little useless without ratbagd.
+
+Sources
+=======
+
+https://github.com/libratbag/piper
+
+https://github.com/libratbag/ratbagd
+https://github.com/libratbag/libratbag
+
+Contributing
+============
+
+Yes please. As you can see, years of design experience have gone into the
+user interface and it is clearly the pinnacle of what is possible.
+Feel free to send patches or pull requests or submit improvements for
+the general design of the app.
+
+Note that the devices displayed by Piper come from libratbag.
+
+Screenshots
+===========
+
+![Piper screenshot](http://imgur.com/ELLCiSE.png)
+
 License
 =======
 
