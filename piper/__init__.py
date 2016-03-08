@@ -462,10 +462,10 @@ class PiperImage(Gtk.EventBox):
         print(event.x)
 
 def main():
+    import signal
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
     win = Piper()
     Gtk.main()
 
 if __name__ == '__main__':
-    import signal
-    signal.signal(signal.SIGINT, signal.SIG_DFL)
     main()
