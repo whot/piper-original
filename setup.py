@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name='piper',
     description='Piper is a GUI interface to ratbagd, the system daemon for configurable mice',
-    version='0.1',
+    version='0.2',
     url='https://github.com/libratbag/piper',
     license='License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
     classifiers=[
