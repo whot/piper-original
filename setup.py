@@ -28,5 +28,5 @@ setup(
     package_data={'piper': ['piper.ui', '404.svg']},
     zip_safe=False,
     data_files=[('share/applications', ['piper.desktop']),
-                ('icons/hicolor/scalable/apps', ['piper.svg'])],
+                ('share/icons/hicolor/scalable/apps', ['piper.svg'])],
 )
