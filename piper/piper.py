@@ -111,7 +111,7 @@ class Piper(Gtk.Window):
     def  _init_header(self, device):
         hb = Gtk.HeaderBar()
         hb.set_show_close_button(True)
-        hb.props.title = "{}".format(device.description)
+        hb.props.title = "{}".format(device.name)
         self.set_titlebar(hb)
 
         # apply/reset buttons
