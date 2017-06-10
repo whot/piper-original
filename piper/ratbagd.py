@@ -57,14 +57,17 @@ class _RatbagdDBus(object):
         return p
 
     def dbus_call(self, method, type, *value):
-        val = GLib.Variant("({})".format(type), value )
-        self._proxy.call_sync(method, val, Gio.DBusCallFlags.NO_AUTO_START, 500, None)
+        val = GLib.Variant("({})".format(type), value)
+        res = self._proxy.call_sync(method, val, Gio.DBusCallFlags.NO_AUTO_START, 500, None)
+        if res != None:
+            return res.unpack()
+        return res
 
 class Ratbagd(_RatbagdDBus):
     """
     The ratbagd top-level object. Provides a list of devices available
-    through ratbagd, actual interaction with the devices is via the
-    RatbagdDevice, RatbagdProfile and RatbagdResolution objects.
+    through ratbagd; actual interaction with the devices is via the
+    RatbagdDevice, RatbagdProfile, RatbagdResolution and RatbagdButton objects.
 
     Throws RatbagdDBusUnavailable when the DBus service is not available.
     """
@@ -81,24 +84,32 @@ class Ratbagd(_RatbagdDBus):
         A list of RatbagdDevice objects supported by ratbagd.
         """
         return self._devices
+    # TODO: DeviceNew, DeviceRemoved
 
 class RatbagdDevice(_RatbagdDBus):
-    CAP_SWITCHABLE_RESOLUTION = 1
-    CAP_SWITCHABLE_PROFILE = 2
-    CAP_BUTTON_KEY = 3
-    CAP_LED = 4
-    CAP_BUTTON_MACROS = 5
-    CAP_DEFAULT_PROFILE = 6
-    CAP_QUERY_CONFIGURATION = 7
-    CAP_DISABLE_PROFILE = 8
-
     """
     Represents a ratbagd device.
     """
+
+    CAP_NONE = 0
+    CAP_QUERY_CONFIGURATION = 1
+    CAP_RESOLUTION = 100
+    CAP_SWITCHABLE_RESOLUTION = 101
+    CAP_PROFILE = 200
+    CAP_SWITCHABLE_PROFILE = 201
+    CAP_DISABLE_PROFILE = 202
+    CAP_DEFAULT_PROFILE = 203
+    CAP_BUTTON = 300
+    CAP_BUTTON_KEY = 301
+    CAP_BUTTON_MACROS = 302
+    CAP_LED = 400
+
     def __init__(self, object_path):
         _RatbagdDBus.__init__(self, "Device", object_path)
+        self._objpath = object_path
         self._devnode = self.dbus_property("Id")
-        self._name = self.dbus_property("Name")
+        self._caps = self.dbus_property("Capabilities")
+        self._description = self.dbus_property("Description")
         self._svg = self.dbus_property("Svg")
         self._svg_path = self.dbus_property("SvgPath")
 
@@ -109,21 +120,29 @@ class RatbagdDevice(_RatbagdDBus):
             self._profiles = [RatbagdProfile(objpath) for objpath in result]
             self._active_profile = self.dbus_property("ActiveProfile")
 
-        self._caps = self.dbus_property("Capabilities")
+    @property
+    def id(self):
+        """
+        The unique identifier of this device.
+        """
+        return self._devnode
 
     @property
-    def profiles(self):
+    def capabilities(self):
         """
-        A list of RatbagdProfile objects provided by this device.
+        The capabilities of this device as an array. Capabilities not present on
+        the device are not in the list. Thus use e.g.
+            if RatbagdDevice.CAP_SWITCHABLE_RESOLUTION is in device.capabilities:
+                 do something
         """
-        return self._profiles
+        return self._caps
 
     @property
-    def name(self):
+    def description(self):
         """
         The device name, usually provided by the kernel.
         """
-        return self._name
+        return self._description
 
     @property
     def svg(self):
@@ -136,17 +155,16 @@ class RatbagdDevice(_RatbagdDBus):
     @property
     def svg_path(self):
         """
-        The absolute SVG path. This function returns the full path to the
-        svg file.
+        The full, absolute path to the SVG.
         """
         return self._svg_path
 
     @property
-    def id(self):
+    def profiles(self):
         """
-        A unique identifier for this device.
+        A list of RatbagdProfile objects provided by this device.
         """
-        return self._devnode
+        return self._profiles
 
     @property
     def active_profile(self):
@@ -158,39 +176,35 @@ class RatbagdDevice(_RatbagdDBus):
             return None
         return self._profiles[self._active_profile]
 
-    @property
-    def capabilities(self):
+    def get_profile_by_index(self, index):
         """
-        Return the capabilities of this device as an array.
-        Capabilities not present on the device are not in the list. Thus use
-        e.g.
-            if RatbagdDevice.CAP_SWITCHABLE_RESOLUTION is in device.caps:
-                 do something
+        Returns the profile found at the given index, or None if no profile was
+        found.
         """
-        return self._caps
+        return self.dbus_call("GetProfileByIndex", "u", index)
 
     def __eq__(self, other):
         return other and self._objpath == other._objpath
 
 class RatbagdProfile(_RatbagdDBus):
     """
-    Represents a ratbagd profile
+    Represents a ratbagd profile.
     """
+
     def __init__(self, object_path):
         _RatbagdDBus.__init__(self, "Profile", object_path)
         self._objpath = object_path
         self._index = self.dbus_property("Index")
-
         self._resolutions = []
-        self._active_resolution_idx = -1
-        self._default_resolution_idx = -1
         self._buttons = []
+        self._active_resolution_index = -1
+        self._default_resolution_index = -1
 
         result = self.dbus_property("Resolutions")
         if result != None:
             self._resolutions = [RatbagdResolution(objpath) for objpath in result]
-            self._active_resolution_idx = self.dbus_property("ActiveResolution")
-            self._default_resolution_idx = self.dbus_property("DefaultResolution")
+            self._active_resolution_index = self.dbus_property("ActiveResolution")
+            self._default_resolution_index = self.dbus_property("DefaultResolution")
 
         result = self.dbus_property("Buttons")
         if result != None:
@@ -198,6 +212,9 @@ class RatbagdProfile(_RatbagdDBus):
 
     @property
     def index(self):
+        """
+        The index of this profile.
+        """
         return self._index
 
     @property
@@ -208,26 +225,6 @@ class RatbagdProfile(_RatbagdDBus):
         return self._resolutions
 
     @property
-    def active_resolution(self):
-        """
-        The currently active resolution. This function returns a
-        RatbagdResolution object or None.
-        """
-        if self._active_resolution_idx == -1:
-            return None
-        return self._resolutions[self._active_resolution_idx]
-
-    @property
-    def default_resolution(self):
-        """
-        The default resolution. This function returns a RatbagdResolution
-        object or None.
-        """
-        if self._default_resolution_idx == -1:
-            return None
-        return self._resolutions[self._default_resolution_idx]
-
-    @property
     def buttons(self):
         """
         A list of RatbagdButton objects with this profile's button
@@ -236,55 +233,111 @@ class RatbagdProfile(_RatbagdDBus):
         """
         return self._buttons
 
+    @property
+    def active_resolution(self):
+        """
+        The currently active resolution. This function returns a
+        RatbagdResolution object or None.
+        """
+        if self._active_resolution_index == -1:
+            return None
+        return self._resolutions[self._active_resolution_index]
+
+    @property
+    def default_resolution(self):
+        """
+        The default resolution. This function returns a RatbagdResolution
+        object or None.
+        """
+        if self._default_resolution_index == -1:
+            return None
+        return self._resolutions[self._default_resolution_index]
+
+    def set_active(self):
+        """
+        Set this profile to be the active profile.
+        """
+        return self.dbus_call("SetActive", "")
+
+    def get_resolution_by_index(self, index):
+        """
+        Returns the resolution found at the given index. This function returns a
+        RatbagdResolution or None if no resolution was found.
+        """
+        return self.dbus_call("GetResolutionByIndex", "u", index)
+
+    # TODO: active profile changed
+
     def __eq__(self, other):
         return self._objpath == other._objpath
 
 class RatbagdResolution(_RatbagdDBus):
-    CAP_INDIVIDUAL_REPORT_RATE = 1
-    CAP_SEPARATE_XY_RESOLUTION = 2
     """
     Represents a ratbagd resolution.
     """
+
+    CAP_INDIVIDUAL_REPORT_RATE = 1
+    CAP_SEPARATE_XY_RESOLUTION = 2
+
     def __init__(self, object_path):
         _RatbagdDBus.__init__(self, "Resolution", object_path)
+        self._objpath = object_path
         self._index = self.dbus_property("Index")
+        self._caps = self.dbus_property("Capabilities")
         self._xres = self.dbus_property("XResolution")
         self._yres = self.dbus_property("YResolution")
         self._rate = self.dbus_property("ReportRate")
-        self._objpath = object_path
 
-        self._caps = self.dbus_property("Capabilities")
+    @property
+    def index(self):
+        """The index of this resolution."""
+        return self._index
+
+    @property
+    def capabilities(self):
+        """
+        The capabilities of this resolution as a list. Capabilities not present
+        on the resolution are not in the list. Thus use e.g.
+            if RatbagdResolution.CAP_SEPARATE_XY_RESOLUTION is in resolution.capabilities:
+                 do something
+        """
+        return self._caps
 
     @property
     def resolution(self):
-        """Returns the tuple (xres, yres) with each resolution in DPI"""
+        """
+        The tuple (xres, yres) with each resolution in DPI.
+        """
         return (self._xres, self._yres)
 
     @resolution.setter
     def resolution(self, res):
+        """
+        Set the x- and y-resolution using the given (xres, yres) tuple.
+        """
         return self.dbus_call("SetResolution", "uu", *res)
 
     @property
     def report_rate(self):
         """
-        Returns the report rate in Hz.
+        The report rate in Hz.
         """
         return self._rate
 
     @report_rate.setter
     def report_rate(self, rate):
+        """
+        Set the report rate in Hz.
+        """
         return self.dbus_call("SetReportRate", "u", rate)
 
-    @property
-    def capabilities(self):
+    def set_default(self):
         """
-        Return the capabilities of this device as a list.
-        Capabilities not present on the device are not in the list. Thus use
-        e.g.
-            if RatbagdResolution.CAP_SEPARATE_XY_RESOLUTION is in resolution.caps:
-                 do something
+        Set this resolution to be the default.
         """
-        return self._caps
+        return self.dbus_call("SetDefault", "")
+
+    # TODO: ActiveResolutionChanged, DefaultResolutionChanged
 
     def __eq__(self, other):
         return self._objpath == other._objpath
@@ -295,47 +348,91 @@ class RatbagdButton(_RatbagdDBus):
     """
     def __init__(self, object_path):
         _RatbagdDBus.__init__(self, "Button", object_path)
+        self._objpath = object_path
         self._index = self.dbus_property("Index")
+        self._type = self.dbus_property("Type")
         self._button = self.dbus_property("ButtonMapping")
+        self._special = self.dbus_property("SpecialMapping")
+        self._key = self.dbus_property("KeyMapping")
+        self._action = self.dbus_property("ActionType")
+        self._types = self.dbus_property("ActionTypes")
 
     @property
     def index(self):
+        """
+        The index of this button.
+        """
         return self._index
 
     @property
     def button_type(self):
-        return self.dbus_property("Type")
+        """
+        A string describing this button's type.
+        """
+        return self._type
 
     @property
-    def action_type(self):
-        return self.dbus_property("ActionType")
-
-    @property
-    def special(self):
-        self._special = self.dbus_property("SpecialMapping")
-        return self._special
-
-    @special.setter
-    def special(self, special):
-        return self.dbus_call("SetSpecialMapping", "s", special)
-
-    @property
-    def key(self):
-        self._key = self.dbus_property("KeyMapping")
-        return self._key
-
-    @key.setter
-    def key(self, key, modifiers):
-        return self.dbus_call("SetKeyMapping", "au", [key].append(modifiers))
-
-    @property
-    def button(self):
-        self._button = self.dbus_property("ButtonMapping")
+    def button_mapping(self):
+        """
+        An integer of the current button mapping, if mapping to a button.
+        """
         return self._button
 
     @button.setter
     def button(self, button):
+        """
+        Set the button mapping to the given button.
+        """
         return self.dbus_call("SetButtonMapping", "u", button)
 
+    @property
+    def special(self):
+        """
+        A string of te current special mapping, if mapped to special.
+        """
+        return self._special
+
+    @special.setter
+    def special(self, special):
+        """
+        Set the button mapping to the given special entry.
+        """
+        return self.dbus_call("SetSpecialMapping", "s", special)
+
+    @property
+    def key(self):
+        """
+        An array of integers, the first being the keycode and the other entries,
+        if any, are modifiers (if mapped to key).
+        """
+        return self._key
+
+    @key.setter
+    def key(self, key, modifiers):
+        """
+        Set the key mapping. The first entry is the keycode, other entries (if
+        any), are modifier keycodes.
+        """
+        return self.dbus_call("SetKeyMapping", "au", [key].append(modifiers))
+
+    @property
+    def action_type(self):
+        """
+        A string describing the action type of the button. One of "none",
+        "button", "key", "special", "macro" or "unknown". This decides which
+        *Mapping property has a value.
+        """
+        return self._action
+
+    @property
+    def action_types(self):
+        """
+        An array of possible values for ActionType.
+        """
+        return self._types
+
     def disable(self):
+        """
+        Disable this button.
+        """
         return self.dbus_call("Disable", "")
