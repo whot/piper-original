@@ -75,9 +75,9 @@ class Ratbagd(_RatbagdDBus):
 
     __gsignals__ = {
         "device-added":
-            (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [str])
+            (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [str]),
         "device-removed":
-            (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [str])
+            (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [str]),
     }
 
     def __init__(self):
@@ -209,7 +209,7 @@ class RatbagdProfile(_RatbagdDBus):
 
     __gsignals__ = {
         "active-profile-changed":
-            (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [int])
+            (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [int]),
     }
 
     def __init__(self, object_path):
@@ -306,9 +306,9 @@ class RatbagdResolution(_RatbagdDBus):
 
     __gsignals__ = {
         "active-resolution-changed":
-            (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [int])
+            (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [int]),
         "default-resolution-changed":
-            (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [int])
+            (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [int]),
     }
 
     def __init__(self, object_path):
