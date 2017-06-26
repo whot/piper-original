@@ -205,6 +205,7 @@ class RatbagdProfile(_RatbagdDBus):
         self._index = self.dbus_property("Index")
         self._resolutions = []
         self._buttons = []
+        self._leds = []
         self._active_resolution_index = -1
         self._default_resolution_index = -1
 
@@ -217,6 +218,10 @@ class RatbagdProfile(_RatbagdDBus):
         result = self.dbus_property("Buttons")
         if result is not None:
             self._buttons = [RatbagdButton(objpath) for objpath in result]
+
+        result = self.dbus_property("Leds")
+        if result is not None:
+            self._leds = [RatbagdLed(objpath) for objpath in result]
 
     def _on_g_signal(self, proxy, sender, signal, params):
         params = params.unpack()
@@ -240,6 +245,11 @@ class RatbagdProfile(_RatbagdDBus):
         Note that the list of buttons differs between profiles but the number
         of buttons is identical across profiles."""
         return self._buttons
+
+    @GObject.Property
+    def leds(self):
+        """A list of RatbagdLed objects with this profile's leds."""
+        return self._leds
 
     @GObject.Property
     def active_resolution(self):
@@ -430,3 +440,86 @@ class RatbagdButton(_RatbagdDBus):
     def disable(self):
         """Disables this button."""
         return self.dbus_call("Disable", "")
+
+
+class RatbagdLed(_RatbagdDBus):
+    """Represents a ratbagd led."""
+
+    LED_MODE_OFF = 0
+    LED_MODE_ON = 1
+    LED_MODE_CYCLE = 2
+    LED_MODE_BREATHING = 3
+
+    def __init__(self, object_path):
+        _RatbagdDBus.__init__(self, "Led", object_path)
+        self._objpath = object_path
+        self._index = self.dbus_property("Index")
+        self._mode = self.dbus_property("Mode")
+        self._type = self.dbus_property("Type")
+        self._color = self.dbus_property("Color")
+        self._effect_rate = self.dbus_property("EffectRate")
+        self._brightness = self.dbus_property("Brightness")
+
+    @GObject.Property
+    def index(self):
+        """The index of this led."""
+        return self._index
+
+    @GObject.Property
+    def mode(self):
+        """This led's mode, one of LED_MODE_OFF, LED_MODE_ON, LED_MODE_CYCLE and
+        LED_MODE_BREATHING."""
+        return self._mode
+
+    @mode.setter
+    def mode(self, mode):
+        """Set the led's mode to the given mode.
+
+        @param mode The new mode, as one of LED_MODE_OFF, LED_MODE_ON,
+                                  LED_MODE_CYCLE and LED_MODE_BREATHING.
+        """
+        return self.dbus_call("SetMode", "u", mode)
+
+    @GObject.Property
+    def type(self):
+        """A string describing this led's type."""
+        return self._type
+
+    @GObject.Property
+    def color(self):
+        """An integer triple of the current LED color."""
+        return self._color
+
+    @color.setter
+    def color(self, color):
+        """Set the led color to the given color.
+
+        @param color An RGB color, as an integer triplet.
+        """
+        return self.dbus_call("SetColor", "(uuu)", color)
+
+    @GObject.Property
+    def effect_rate(self):
+        """The LED's effect rate in Hz, values range from 100 to 20000."""
+        return self._effect_rate
+
+    @effect_rate.setter
+    def effect_rate(self, effect_rate):
+        """Set the effect rate in Hz. Allowed values range from 100 to 20000.
+
+        @param effect_rate The new effect rate, as int
+        """
+        return self.dbus_call("SetEffectRate", "u", effect_rate)
+
+    @GObject.Property
+    def brightness(self):
+        """The LED's brightness, values range from 0 to 255."""
+        return self._brightness
+
+    @brightness.setter
+    def brightness(self, brightness):
+        """Set the brightness. Allowed values range from 0 to 255.
+
+        @param brightness The new brightness, as int
+        """
+        return self.dbus_call("SetBrightness", "i", brightness)
