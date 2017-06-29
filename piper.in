@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 
-import sys
-import signal
-import os
-import locale
 import gettext
+import gi
+import locale
+import os
+import signal
+import sys
 
 from piper import piper
 
-import gi
 gi.require_version('Gio', '2.0')
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gio, Gtk
@@ -23,8 +23,9 @@ if os.path.exists(os.path.join(srcdir, 'meson.build')):
 else:
     pkgdatadir = '@pkgdatadir@'
 
+
 def install_excepthook():
-    """ Make sure we exit when an unhandled exception occurs. """
+    """Make sure we exit when an unhandled exception occurs."""
     old_hook = sys.excepthook
 
     def new_hook(etype, evalue, etb):
@@ -33,6 +34,7 @@ def install_excepthook():
             Gtk.main_quit()
         sys.exit()
     sys.excepthook = new_hook
+
 
 if __name__ == "__main__":
     install_excepthook()

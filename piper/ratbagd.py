@@ -23,11 +23,11 @@
 
 from gi.repository import Gio, GLib, GObject
 
+
 class RatbagdDBusUnavailable(BaseException):
-    """
-    Signals DBus is unavailable or the ratbagd daemon is not available.
-    """
+    """Signals DBus is unavailable or the ratbagd daemon is not available."""
     pass
+
 
 class _RatbagdDBus(GObject.GObject):
     def __init__(self, interface, object_path):
@@ -41,9 +41,9 @@ class _RatbagdDBus(GObject.GObject):
             self._proxy = Gio.DBusProxy.new_sync(self._dbus,
                                                  Gio.DBusProxyFlags.NONE,
                                                  None,
-                                                 'org.freedesktop.ratbag1',
+                                                 "org.freedesktop.ratbag1",
                                                  object_path,
-                                                 'org.freedesktop.ratbag1.{}'.format(interface),
+                                                 "org.freedesktop.ratbag1.{}".format(interface),
                                                  None)
         except GLib.GError:
             raise RatbagdDBusUnavailable()
@@ -53,20 +53,21 @@ class _RatbagdDBus(GObject.GObject):
 
     def dbus_property(self, property):
         p = self._proxy.get_cached_property(property)
-        if p != None:
+        if p is not None:
             return p.unpack()
         return p
 
     def dbus_call(self, method, type, *value):
         val = GLib.Variant("({})".format(type), value)
-        res = self._proxy.call_sync(method, val, Gio.DBusCallFlags.NO_AUTO_START, 500, None)
-        if res != None:
+        res = self._proxy.call_sync(method, val,
+                                    Gio.DBusCallFlags.NO_AUTO_START, 500, None)
+        if res is not None:
             return res.unpack()
         return res
 
+
 class Ratbagd(_RatbagdDBus):
-    """
-    The ratbagd top-level object. Provides a list of devices available
+    """The ratbagd top-level object. Provides a list of devices available
     through ratbagd; actual interaction with the devices is via the
     RatbagdDevice, RatbagdProfile, RatbagdResolution and RatbagdButton objects.
 
@@ -81,11 +82,11 @@ class Ratbagd(_RatbagdDBus):
     }
 
     def __init__(self):
-        _RatbagdDBus.__init__(self, "Manager", '/org/freedesktop/ratbag1')
+        _RatbagdDBus.__init__(self, "Manager", "/org/freedesktop/ratbag1")
         self._proxy.connect("g-signal", self._on_g_signal)
         self._devices = []
         result = self.dbus_property("Devices")
-        if result != None:
+        if result is not None:
             self._devices = [RatbagdDevice(objpath) for objpath in result]
 
     def _on_g_signal(self, proxy, sender, signal, params):
@@ -97,15 +98,12 @@ class Ratbagd(_RatbagdDBus):
 
     @GObject.Property
     def devices(self):
-        """
-        A list of RatbagdDevice objects supported by ratbagd.
-        """
+        """A list of RatbagdDevice objects supported by ratbagd."""
         return self._devices
 
+
 class RatbagdDevice(_RatbagdDBus):
-    """
-    Represents a ratbagd device.
-    """
+    """Represents a ratbagd device."""
 
     CAP_NONE = 0
     CAP_QUERY_CONFIGURATION = 1
@@ -132,80 +130,68 @@ class RatbagdDevice(_RatbagdDBus):
         self._profiles = []
         self._active_profile = -1
         result = self.dbus_property("Profiles")
-        if result != None:
+        if result is not None:
             self._profiles = [RatbagdProfile(objpath) for objpath in result]
             self._active_profile = self.dbus_property("ActiveProfile")
 
     @GObject.Property
     def id(self):
-        """
-        The unique identifier of this device.
-        """
+        """The unique identifier of this device."""
         return self._devnode
 
     @GObject.Property
     def capabilities(self):
-        """
-        The capabilities of this device as an array. Capabilities not present on
-        the device are not in the list. Thus use e.g.
-            if RatbagdDevice.CAP_SWITCHABLE_RESOLUTION is in device.capabilities:
-                 do something
+        """The capabilities of this device as an array. Capabilities not
+        present on the device are not in the list. Thus use e.g.
+
+        if RatbagdDevice.CAP_SWITCHABLE_RESOLUTION is in device.capabilities:
+            do something
         """
         return self._caps
 
     @GObject.Property
     def description(self):
-        """
-        The device name, usually provided by the kernel.
-        """
+        """The device name, usually provided by the kernel."""
         return self._description
 
     @GObject.Property
     def svg(self):
-        """
-        The SVG file name. This function returns the file name only, not the
-        absolute path to the file.
-        """
+        """The SVG file name. This function returns the file name only, not the
+        absolute path to the file."""
         return self._svg
 
     @GObject.Property
     def svg_path(self):
-        """
-        The full, absolute path to the SVG.
-        """
+        """The full, absolute path to the SVG."""
         return self._svg_path
 
     @GObject.Property
     def profiles(self):
-        """
-        A list of RatbagdProfile objects provided by this device.
-        """
+        """A list of RatbagdProfile objects provided by this device."""
         return self._profiles
 
     @GObject.Property
     def active_profile(self):
-        """
-        The currently active profile. This function returns a RatbagdProfile
-        or None if no active profile was found.
-        """
+        """The currently active profile. This function returns a RatbagdProfile
+        or None if no active profile was found."""
         if self._active_profile == -1:
             return None
         return self._profiles[self._active_profile]
 
     def get_profile_by_index(self, index):
-        """
-        Returns the profile found at the given index, or None if no profile was
-        found.
+        """Returns the profile found at the given index, or None if no profile
+        was found.
+
+        @param index The index to find the profile at, as int
         """
         return self.dbus_call("GetProfileByIndex", "u", index)
 
     def __eq__(self, other):
         return other and self._objpath == other._objpath
 
+
 class RatbagdProfile(_RatbagdDBus):
-    """
-    Represents a ratbagd profile.
-    """
+    """Represents a ratbagd profile."""
 
     __gsignals__ = {
         "active-profile-changed":
@@ -223,13 +209,13 @@ class RatbagdProfile(_RatbagdDBus):
         self._default_resolution_index = -1
 
         result = self.dbus_property("Resolutions")
-        if result != None:
+        if result is not None:
             self._resolutions = [RatbagdResolution(objpath) for objpath in result]
             self._active_resolution_index = self.dbus_property("ActiveResolution")
             self._default_resolution_index = self.dbus_property("DefaultResolution")
 
         result = self.dbus_property("Buttons")
-        if result != None:
+        if result is not None:
             self._buttons = [RatbagdButton(objpath) for objpath in result]
 
     def _on_g_signal(self, proxy, sender, signal, params):
@@ -239,67 +225,53 @@ class RatbagdProfile(_RatbagdDBus):
 
     @GObject.Property
     def index(self):
-        """
-        The index of this profile.
-        """
+        """The index of this profile."""
         return self._index
 
     @GObject.Property
     def resolutions(self):
-        """
-        A list of RatbagdResolution objects with this profile's resolutions.
+        """A list of RatbagdResolution objects with this profile's resolutions.
         """
         return self._resolutions
 
     @GObject.Property
     def buttons(self):
-        """
-        A list of RatbagdButton objects with this profile's button
-        mappings. Note that the list of buttons differs between profiles but
-        the number of buttons is identical across profiles.
-        """
+        """A list of RatbagdButton objects with this profile's button mappings.
+        Note that the list of buttons differs between profiles but the number
+        of buttons is identical across profiles."""
         return self._buttons
 
     @GObject.Property
     def active_resolution(self):
-        """
-        The currently active resolution. This function returns a
-        RatbagdResolution object or None.
-        """
+        """The currently active resolution. This function returns a
+        RatbagdResolution object or None."""
         if self._active_resolution_index == -1:
             return None
         return self._resolutions[self._active_resolution_index]
 
     @GObject.Property
     def default_resolution(self):
-        """
-        The default resolution. This function returns a RatbagdResolution
-        object or None.
-        """
+        """The default resolution. This function returns a RatbagdResolution
+        object or None."""
         if self._default_resolution_index == -1:
             return None
         return self._resolutions[self._default_resolution_index]
 
     def set_active(self):
-        """
-        Set this profile to be the active profile.
-        """
+        """Set this profile to be the active profile."""
         return self.dbus_call("SetActive", "")
 
     def get_resolution_by_index(self, index):
-        """
-        Returns the resolution found at the given index. This function returns a
-        RatbagdResolution or None if no resolution was found.
-        """
+        """Returns the resolution found at the given index. This function
+        returns a RatbagdResolution or None if no resolution was found."""
         return self.dbus_call("GetResolutionByIndex", "u", index)
 
     def __eq__(self, other):
         return self._objpath == other._objpath
 
+
 class RatbagdResolution(_RatbagdDBus):
-    """
-    Represents a ratbagd resolution.
-    """
+    """Represents a ratbagd resolution."""
 
     CAP_INDIVIDUAL_REPORT_RATE = 1
     CAP_SEPARATE_XY_RESOLUTION = 2
@@ -335,55 +307,51 @@ class RatbagdResolution(_RatbagdDBus):
 
     @GObject.Property
     def capabilities(self):
-        """
-        The capabilities of this resolution as a list. Capabilities not present
-        on the resolution are not in the list. Thus use e.g.
-            if RatbagdResolution.CAP_SEPARATE_XY_RESOLUTION is in resolution.capabilities:
-                 do something
+        """The capabilities of this resolution as a list. Capabilities not
+        present on the resolution are not in the list. Thus use e.g.
+
+        if RatbagdResolution.CAP_SEPARATE_XY_RESOLUTION is in resolution.capabilities:
+            do something
         """
         return self._caps
 
     @GObject.Property
     def resolution(self):
-        """
-        The tuple (xres, yres) with each resolution in DPI.
-        """
+        """The tuple (xres, yres) with each resolution in DPI."""
         return (self._xres, self._yres)
 
     @resolution.setter
     def resolution(self, res):
-        """
-        Set the x- and y-resolution using the given (xres, yres) tuple.
+        """Set the x- and y-resolution using the given (xres, yres) tuple.
+
+        @param res The new resolution, as (int, int)
         """
         return self.dbus_call("SetResolution", "uu", *res)
 
     @GObject.Property
     def report_rate(self):
-        """
-        The report rate in Hz.
-        """
+        """The report rate in Hz."""
         return self._rate
 
     @report_rate.setter
     def report_rate(self, rate):
-        """
-        Set the report rate in Hz.
+        """Set the report rate in Hz.
+
+        @param rate The new report rate, as int
         """
         return self.dbus_call("SetReportRate", "u", rate)
 
     def set_default(self):
-        """
-        Set this resolution to be the default.
-        """
+        """Set this resolution to be the default."""
         return self.dbus_call("SetDefault", "")
 
     def __eq__(self, other):
         return self._objpath == other._objpath
 
+
 class RatbagdButton(_RatbagdDBus):
-    """
-    Represents a ratbagd button.
-    """
+    """Represents a ratbagd button."""
+
     def __init__(self, object_path):
         _RatbagdDBus.__init__(self, "Button", object_path)
         self._objpath = object_path
@@ -397,66 +365,58 @@ class RatbagdButton(_RatbagdDBus):
 
     @GObject.Property
     def index(self):
-        """
-        The index of this button.
-        """
+        """The index of this button."""
         return self._index
 
     @GObject.Property
     def button_type(self):
-        """
-        A string describing this button's type.
-        """
+        """A string describing this button's type."""
         return self._type
 
     @GObject.Property
     def button_mapping(self):
-        """
-        An integer of the current button mapping, if mapping to a button.
-        """
+        """An integer of the current button mapping, if mapping to a button."""
         return self._button
 
     @button_mapping.setter
     def button_mapping(self, button):
-        """
-        Set the button mapping to the given button.
+        """Set the button mapping to the given button.
+
+        @param button The button to map to, as int
         """
         return self.dbus_call("SetButtonMapping", "u", button)
 
     @GObject.Property
     def special(self):
-        """
-        A string of te current special mapping, if mapped to special.
-        """
+        """A string of the current special mapping, if mapped to special."""
         return self._special
 
     @special.setter
     def special(self, special):
-        """
-        Set the button mapping to the given special entry.
+        """Set the button mapping to the given special entry.
+
+        @param special The special entry, as str
         """
         return self.dbus_call("SetSpecialMapping", "s", special)
 
     @GObject.Property
     def key(self):
-        """
-        An array of integers, the first being the keycode and the other entries,
-        if any, are modifiers (if mapped to key).
-        """
+        """An array of integers, the first being the keycode and the other
+        entries, if any, are modifiers (if mapped to key)."""
         return self._key
 
     @key.setter
     def key(self, key, modifiers):
-        """
-        Set the key mapping. The first entry is the keycode, other entries (if
-        any), are modifier keycodes.
+        """Set the key mapping.
+
+        @param key The keycode, as int
+        @param modifiers Modifier keycodes, as [int]
         """
         return self.dbus_call("SetKeyMapping", "au", [key].append(modifiers))
 
     @GObject.Property
     def action_type(self):
-        """
-        A string describing the action type of the button. One of "none",
+        """A string describing the action type of the button. One of "none",
         "button", "key", "special", "macro" or "unknown". This decides which
         *Mapping property has a value.
         """
@@ -464,13 +424,9 @@ class RatbagdButton(_RatbagdDBus):
 
     @GObject.Property
     def action_types(self):
-        """
-        An array of possible values for ActionType.
-        """
+        """An array of possible values for ActionType."""
         return self._types
 
     def disable(self):
-        """
-        Disable this button.
-        """
+        """Disables this button."""
         return self.dbus_call("Disable", "")
