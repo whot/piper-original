@@ -32,6 +32,11 @@ Screenshots
 
 ![Piper screenshot](http://imgur.com/ELLCiSE.png)
 
+Build Status
+============
+
+[![CircleCI](https://circleci.com/gh/libratbag/piper.svg?style=svg&circle-token=7082ad7a7fea706fff66f1547649dca32e446cb0)](https://circleci.com/gh/libratbag/piper)
+
 License
 =======
 

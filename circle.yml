@@ -1,0 +1,24 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/piper
+    docker:
+      - image: fedora:rawhide
+    steps:
+      - run:
+          command: |
+            dnf install -y git python3-flake8
+      - checkout
+      - run: flake8-3 . piper.in
+
+      # now install and checks the resulting file (just in case)
+      - run:
+          command: |
+            dnf install -y meson python3-devel pygobject3-devel
+      - run:
+          command: |
+            meson build
+            ninja -C build
+      - run: flake8-3 buildir/piper
+      - store_artifacts:
+          path: ~/piper/build/meson-logs
