@@ -302,6 +302,8 @@ class RatbagdResolution(_RatbagdDBus):
         self._xres = self.dbus_property("XResolution")
         self._yres = self.dbus_property("YResolution")
         self._rate = self.dbus_property("ReportRate")
+        self._max_res = self.dbus_property("MaxRes")
+        self._min_res = self.dbus_property("MinRes")
 
     def _on_g_signal(self, proxy, sender, signal, params):
         params = params.unpack()
@@ -342,6 +344,16 @@ class RatbagdResolution(_RatbagdDBus):
     def report_rate(self):
         """The report rate in Hz."""
         return self._rate
+
+    @GObject.Property
+    def max_res(self):
+        """The maximum possible resolution."""
+        return self._max_res
+
+    @GObject.Property
+    def min_res(self):
+        """The minimum possible resolution."""
+        return self._min_res
 
     @report_rate.setter
     def report_rate(self, rate):
