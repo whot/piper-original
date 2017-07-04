@@ -253,7 +253,7 @@ class Piper(Gtk.Window):
         for l, button in zip(self._button_function_labels, buttons):
             action = button.action_type
             if action == "button":
-                text = "Button {} click".format(button.button)
+                text = "Button {} click".format(button.button_mapping)
             elif action == "key":
                 text = "Key event: {}".format(button.key[0])
             elif action == "macro":
