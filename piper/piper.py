@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # vim: set expandtab shiftwidth=4 tabstop=4
 
-from ratbagd import *
+from piper.ratbagd import *
 import os
 
 import gi
